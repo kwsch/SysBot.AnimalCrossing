@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Threading;
 
 namespace SysBot.AnimalCrossing
 {
@@ -25,7 +26,7 @@ namespace SysBot.AnimalCrossing
             var config = JsonSerializer.Deserialize<CrossBotConfig>(json);
             SaveConfig(config);
 
-            await BotRunner.RunFrom(config).ConfigureAwait(false);
+            await BotRunner.RunFrom(config, CancellationToken.None).ConfigureAwait(false);
 
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
