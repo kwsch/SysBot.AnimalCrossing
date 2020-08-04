@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json;
 
@@ -26,42 +25,7 @@ namespace SysBot.AnimalCrossing
             var config = JsonSerializer.Deserialize<CrossBotConfig>(json);
             SaveConfig(config);
 
-            var bot = new CrossBot(config);
-
-            var cancel = CancellationToken.None;
-            var sys = new SysCord(bot);
-
-            Globals.Self = sys;
-            Globals.Bot = bot;
-
-            Console.WriteLine("Starting Discord.");
-#pragma warning disable 4014
-            Task.Run(() => sys.MainAsync(config.Token, cancel), cancel);
-#pragma warning restore 4014
-
-            Console.WriteLine("Starting bot loop.");
-            var task = bot.RunAsync(cancel);
-            await task;
-            if (task.IsFaulted)
-            {
-                if (task.Exception == null)
-                {
-                    Console.WriteLine("Bot has terminated due to an unknown error.");
-                }
-                else
-                {
-                    Console.WriteLine("Bot has terminated due to an error:");
-                    foreach (var ex in task.Exception.InnerExceptions)
-                    {
-                        Console.WriteLine(ex.Message);
-                        Console.WriteLine(ex.StackTrace);
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("Bot has terminated.");
-            }
+            await BotRunner.RunFrom(config).ConfigureAwait(false);
 
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
