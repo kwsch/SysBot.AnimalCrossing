@@ -75,6 +75,24 @@ namespace SysBot.AnimalCrossing
                 await ReplyAsync($"{name}:\r\n{result}").ConfigureAwait(false);
         }
 
+        [Command("stack")]
+        [Summary("Stacks an item and prints the hex code.")]
+        public async Task StackAsync(string itemHex, int count)
+        {
+            ushort itemID = GetID(itemHex);
+            if (itemID == Item.NONE || count < 1 || count > 99)
+            {
+                await ReplyAsync("Invalid item requested.").ConfigureAwait(false);
+                return;
+            }
+
+            var ct = count - 1; // value 0 => count of 1
+            var item = new Item(itemID) {Count = (ushort)ct};
+            var result = BitConverter.ToUInt64(item.ToBytesClass(), 0);
+            var name = GameInfo.Strings.GetItemName(itemID);
+            await ReplyAsync($"{name}:\r\n{result}").ConfigureAwait(false);
+        }
+
         [Command("customize")]
         [Summary("Customizes an item and prints the hex code.")]
         public async Task CustomizeAsync(string itemHex, int sum)
