@@ -20,9 +20,14 @@ namespace SysBot.AnimalCrossing
         [Command("setCode")]
         [Summary("Sets a string to the Dodo Code property for users to call via the associated command.")]
         [RequireSudo]
-        public async Task SetDodoCodeAsync([Remainder]string code)
+        public async Task SetDodoCodeAsync([Remainder] string code)
         {
             var bot = Globals.Bot;
+            if (code.Length != 5)
+            {
+                await ReplyAsync("Dodo Code must be 5 characters long.").ConfigureAwait(false);
+                return;
+            }
             bot.DodoCode = code;
             await ReplyAsync($"The dodo code for the bot has been set to {code}.").ConfigureAwait(false);
         }
