@@ -10,6 +10,8 @@ namespace SysBot.AnimalCrossing
     {
         public static SysCord Self = default!;
         public static CrossBot Bot = default!;
+
+        public static bool DiscordOnly;
     }
 
     public sealed class RequireQueueRoleAttribute : PreconditionAttribute

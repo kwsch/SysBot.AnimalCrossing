@@ -15,6 +15,11 @@ namespace SysBot.AnimalCrossing
         [Summary("Picks up items around the bot.")]
         public async Task RequestCleanAsync()
         {
+            if (Globals.DiscordOnly)
+            {
+                DiscordOnlyReply();
+                return;
+            }
             if (!Globals.Bot.Config.AllowClean)
             {
                 await ReplyAsync("Clean functionality is currently disabled.").ConfigureAwait(false);
@@ -29,14 +34,24 @@ namespace SysBot.AnimalCrossing
         [Summary("Prints the Dodo Code for the island.")]
         public async Task RequestDodoCodeAsync()
         {
+            if (Globals.DiscordOnly)
+            {
+                DiscordOnlyReply();
+                return;
+            }
             await ReplyAsync($"Dodo Code: {Globals.Bot.DodoCode}.").ConfigureAwait(false);
         }
 
         [Command("dropItem")]
         [Alias("drop")]
         [Summary("Drops a custom item (or items).")]
-        public async Task RequestDropAsync([Remainder]string request)
+        public async Task RequestDropAsync([Remainder] string request)
         {
+            if (Globals.DiscordOnly)
+            {
+                DiscordOnlyReply();
+                return;
+            }
             var split = request.Split(new[] { " ", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             var items = DropUtil.GetItems(split, Globals.Bot.Config);
             await DropItems(items).ConfigureAwait(false);
@@ -45,8 +60,13 @@ namespace SysBot.AnimalCrossing
         [Command("dropDIY")]
         [Alias("diy")]
         [Summary("Drops a DIY recipe with the requested recipe ID(s).")]
-        public async Task RequestDropDIYAsync([Remainder]string recipeIDs)
+        public async Task RequestDropDIYAsync([Remainder] string recipeIDs)
         {
+            if (Globals.DiscordOnly)
+            {
+                DiscordOnlyReply();
+                return;
+            }
             var split = recipeIDs.Split(new[] { " ", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             var items = DropUtil.GetDIYItems(split);
             await DropItems(items).ConfigureAwait(false);
@@ -54,6 +74,7 @@ namespace SysBot.AnimalCrossing
 
         private async Task DropItems(IReadOnlyCollection<Item> items)
         {
+
             const int maxRequestCount = 7;
             if (items.Count > maxRequestCount)
             {
@@ -67,6 +88,10 @@ namespace SysBot.AnimalCrossing
 
             var msg = $"Item drop request{(requestInfo.Items.Count > 1 ? "s" : string.Empty)} will be executed momentarily.";
             await ReplyAsync(msg).ConfigureAwait(false);
+        }
+        public async void DiscordOnlyReply()
+        {
+            await ReplyAsync("This feature is currently disabled as this bot is not connected to a Switch.").ConfigureAwait(false);
         }
     }
 }

@@ -39,28 +39,38 @@ namespace SysBot.AnimalCrossing
             Task.Run(() => sys.MainAsync(config.Token, cancel), cancel);
 #pragma warning restore 4014
 
-            Console.WriteLine("Starting bot loop.");
-            var task = bot.RunAsync(cancel);
-            await task;
-            if (task.IsFaulted)
+            if (config.IP.Length < 1)
             {
-                if (task.Exception == null)
-                {
-                    Console.WriteLine("Bot has terminated due to an unknown error.");
-                }
-                else
-                {
-                    Console.WriteLine("Bot has terminated due to an error:");
-                    foreach (var ex in task.Exception.InnerExceptions)
-                    {
-                        Console.WriteLine(ex.Message);
-                        Console.WriteLine(ex.StackTrace);
-                    }
-                }
+                Console.WriteLine("No IP specified, skipping Sysbot loop.");
+                Globals.DiscordOnly = true;
             }
             else
             {
-                Console.WriteLine("Bot has terminated.");
+                Globals.DiscordOnly = false;
+                Console.WriteLine("Starting bot loop.");
+                var task = bot.RunAsync(cancel);
+                await task;
+
+                if (task.IsFaulted)
+                {
+                    if (task.Exception == null)
+                    {
+                        Console.WriteLine("Bot has terminated due to an unknown error.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Bot has terminated due to an error:");
+                        foreach (var ex in task.Exception.InnerExceptions)
+                        {
+                            Console.WriteLine(ex.Message);
+                            Console.WriteLine(ex.StackTrace);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Bot has terminated.");
+                }
             }
 
             Console.WriteLine("Press any key to exit.");
@@ -69,14 +79,14 @@ namespace SysBot.AnimalCrossing
 
         private static void SaveConfig(CrossBotConfig config)
         {
-            var options = new JsonSerializerOptions {WriteIndented = true};
+            var options = new JsonSerializerOptions { WriteIndented = true };
             var json = JsonSerializer.Serialize(config, options);
             File.WriteAllText(ConfigPath, json);
         }
 
         private static void CreateConfigQuit()
         {
-            SaveConfig(new CrossBotConfig {IP = "192.168.0.1", Port = 6000});
+            SaveConfig(new CrossBotConfig { IP = "192.168.0.1", Port = 6000 });
             Console.WriteLine("Created blank config file. Please configure it and restart the program.");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
