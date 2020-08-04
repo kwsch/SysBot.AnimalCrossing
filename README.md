@@ -9,7 +9,7 @@ For support on setting up your own instance of this SysBot.NET bot, feel free to
 
 [sys-botbase](https://github.com/olliz0r/sys-botbase) client for remote control automation of Nintendo Switch consoles.
 
-Uses [Discord.Net](https://github.com/discord-net/Discord.Net) , [TwitchLib](https://github.com/TwitchLib/TwitchLib) and [StreamingClientLibary](https://github.com/SaviorXTanren/StreamingClientLibrary) as a dependency via Nuget.
+Uses [Discord.Net](https://github.com/discord-net/Discord.Net) as a dependency via NuGet.
 
 ## Other Dependencies
 Animal Crossing API logic is provided by [NHSE](https://github.com/kwsch/NHSE/).
