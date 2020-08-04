@@ -15,7 +15,7 @@ pool:
 
 variables:
   Solution: '**/*.sln'
-  Platform: 'AnyCPU'
+  Platform: 'Any CPU'
   Configuration: 'Release'
 
 steps:
