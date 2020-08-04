@@ -88,9 +88,8 @@ namespace SysBot.AnimalCrossing
 
             var ct = count - 1; // value 0 => count of 1
             var item = new Item(itemID) {Count = (ushort)ct};
-            var result = BitConverter.ToUInt64(item.ToBytesClass(), 0);
-            var name = GameInfo.Strings.GetItemName(itemID);
-            await ReplyAsync($"{name}:\r\n{result}").ConfigureAwait(false);
+            var msg = GetItemText(item);
+            await ReplyAsync(msg).ConfigureAwait(false);
         }
 
         [Command("customize")]
@@ -122,9 +121,15 @@ namespace SysBot.AnimalCrossing
                 await ReplyAsync("Requested customization for item appears to be invalid.").ConfigureAwait(false);
 
             var item = new Item(itemID) {BodyType = body, PatternChoice = fabric};
-            var value = BitConverter.ToUInt64(item.ToBytesClass(), 0);
+            var msg = GetItemText(item);
+            await ReplyAsync(msg).ConfigureAwait(false);
+        }
 
-            await ReplyAsync($"{GameInfo.Strings.GetItemName(itemID)}: {value:X16}").ConfigureAwait(false);
+        private static string GetItemText(Item item)
+        {
+            var value = BitConverter.ToUInt64(item.ToBytesClass(), 0);
+            var name = GameInfo.Strings.GetItemName(item.ItemId);
+            return $"{name}: {value:X16}";
         }
 
         private static ushort GetID(string text)
