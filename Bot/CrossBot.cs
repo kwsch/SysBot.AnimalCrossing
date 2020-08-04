@@ -18,9 +18,23 @@ namespace SysBot.AnimalCrossing
         protected override async Task MainLoop(CancellationToken token)
         {
             // Disconnect our virtual controller; will reconnect once we send a button command after a request.
-            await Connection.SendAsync(SwitchCommand.DetachController(), CancellationToken.None);
-            LogUtil.LogInfo("Connected to bot. Starting main loop!", Config.IP);
+            LogUtil.LogInfo("Detatching controller on startup as first interaction.", Config.IP);
+            await Connection.SendAsync(SwitchCommand.DetachController(), token);
+            await Task.Delay(200, token).ConfigureAwait(false);
 
+            // Validate inventory offset.
+            LogUtil.LogInfo("Checking inventory offset for validity.", Config.IP);
+            var (ofs, len) = InventoryValidator.GetOffsetLength(Config.Offset);
+            var inventory = await Connection.ReadBytesAsync(ofs, len, token).ConfigureAwait(false);
+
+            bool valid = InventoryValidator.ValidateItemBinary(inventory);
+            if (!valid)
+            {
+                LogUtil.LogInfo($"Inventory read from {Config.Offset} does not appear to be valid. Exiting!", Config.IP);
+                return;
+            }
+
+            LogUtil.LogInfo("Successfully connected to bot. Starting main loop!", Config.IP);
             int dropCount = 0;
             int idleCount = 0;
             while (!token.IsCancellationRequested)
