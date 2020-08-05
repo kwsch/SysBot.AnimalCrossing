@@ -30,7 +30,7 @@ namespace SysBot.AnimalCrossing
             await PrintItemsAsync(itemName, strings).ConfigureAwait(false);
         }
 
-        private async Task PrintItemsAsync(string itemName, IEnumerable<ComboItem> strings)
+        private async Task PrintItemsAsync(string itemName, IReadOnlyList<ComboItem> strings)
         {
             const int minLength = 2;
             if (itemName.Length <= minLength)
@@ -39,8 +39,18 @@ namespace SysBot.AnimalCrossing
                 return;
             }
 
+            foreach (var item in strings)
+            {
+                if (!string.Equals(item.Text, itemName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var msg = $"{item.Value:X4} {item.Text}";
+                await ReplyAsync(Format.Code(msg)).ConfigureAwait(false);
+                return;
+            }
+
             var ci = CultureInfo.InvariantCulture.CompareInfo;
-            var matches = strings.Where(z => ci.IndexOf(z.Text, itemName, CompareOptions.OrdinalIgnoreCase) >= 0);
+            var matches = strings.Where(z => ci.IndexOf(z.Text, itemName, CompareOptions.OrdinalIgnoreCase) >= 0).ToArray();
             var result = string.Join(Environment.NewLine, matches.Select(z => $"{z.Value:X4} {z.Text}"));
 
             if (result.Length == 0)
@@ -51,7 +61,11 @@ namespace SysBot.AnimalCrossing
 
             const int maxLength = 500;
             if (result.Length > maxLength)
-                result = result.Substring(0, maxLength);
+            {
+                var ordered = matches.OrderBy(z => LevenshteinDistance.Compute(z.Text, itemName));
+                result = string.Join(Environment.NewLine, ordered.Select(z => $"{z.Value:X4} {z.Text}"));
+                result = result.Substring(0, maxLength) + "...[truncated]";
+            }
 
             await ReplyAsync(Format.Code(result)).ConfigureAwait(false);
         }
