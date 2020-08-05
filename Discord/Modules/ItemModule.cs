@@ -116,6 +116,11 @@ namespace SysBot.AnimalCrossing
                 await ReplyAsync("Invalid item requested.").ConfigureAwait(false);
                 return;
             }
+            if (sum <= 0)
+            {
+                await ReplyAsync("No customization data specified.").ConfigureAwait(false);
+                return;
+            }
 
             var remake = ItemRemakeUtil.GetRemakeIndex(itemID);
             if (remake < 0)
@@ -126,10 +131,15 @@ namespace SysBot.AnimalCrossing
 
             int body = sum & 7;
             int fabric = sum >> 5;
+            if (fabric > 7 || ((fabric << 5) | body) != sum)
+            {
+                await ReplyAsync("Invalid customization data specified.").ConfigureAwait(false);
+                return;
+            }
 
             var info = ItemRemakeInfoData.List[remake];
-            bool hasBody = body <= 7 && body <= info.ReBodyPatternNum;
-            bool hasFabric = fabric <= 7 && info.GetFabricDescription(fabric) != "Invalid";
+            bool hasBody = body == 0 || (body <= 7 && body <= info.ReBodyPatternNum);
+            bool hasFabric = fabric == 0 || (fabric <= 7 && info.GetFabricDescription(fabric) != "Invalid");
 
             if (!hasBody || !hasFabric)
                 await ReplyAsync("Requested customization for item appears to be invalid.").ConfigureAwait(false);
