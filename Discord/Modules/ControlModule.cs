@@ -20,7 +20,7 @@ namespace SysBot.AnimalCrossing
         [Command("setCode")]
         [Summary("Sets a string to the Dodo Code property for users to call via the associated command.")]
         [RequireSudo]
-        public async Task SetDodoCodeAsync([Remainder]string code)
+        public async Task SetDodoCodeAsync([Summary("Current Dodo Code for the island.")][Remainder]string code)
         {
             var bot = Globals.Bot;
             bot.DodoCode = code;

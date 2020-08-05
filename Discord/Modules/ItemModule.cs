@@ -15,7 +15,7 @@ namespace SysBot.AnimalCrossing
         [Command("lookupLang")]
         [Alias("ll")]
         [Summary("Gets a list of items that contain the request string.")]
-        public async Task SearchItemsAsync(string language, [Remainder]string itemName)
+        public async Task SearchItemsAsync([Summary("Language code to search with")] string language, [Summary("Item name / item substring")][Remainder]string itemName)
         {
             var strings = GameInfo.GetStrings(language).ItemDataSource;
             await PrintItemsAsync(itemName, strings).ConfigureAwait(false);
@@ -24,7 +24,7 @@ namespace SysBot.AnimalCrossing
         [Command("lookup")]
         [Alias("li")]
         [Summary("Gets a list of items that contain the request string.")]
-        public async Task SearchItemsAsync([Remainder]string itemName)
+        public async Task SearchItemsAsync([Summary("Item name / item substring")][Remainder]string itemName)
         {
             var strings = GameInfo.Strings.ItemDataSource;
             await PrintItemsAsync(itemName, strings).ConfigureAwait(false);
@@ -72,7 +72,7 @@ namespace SysBot.AnimalCrossing
 
         [Command("item")]
         [Summary("Gets the info for an item.")]
-        public async Task GetItemInfoAsync(string itemHex)
+        public async Task GetItemInfoAsync([Summary("Item ID (in hex)")]string itemHex)
         {
             ushort itemID = GetID(itemHex);
             if (itemID == Item.NONE)
@@ -91,7 +91,7 @@ namespace SysBot.AnimalCrossing
 
         [Command("stack")]
         [Summary("Stacks an item and prints the hex code.")]
-        public async Task StackAsync(string itemHex, int count)
+        public async Task StackAsync([Summary("Item ID (in hex)")]string itemHex, [Summary("Count of items in the stack")]int count)
         {
             ushort itemID = GetID(itemHex);
             if (itemID == Item.NONE || count < 1 || count > 99)
@@ -108,7 +108,7 @@ namespace SysBot.AnimalCrossing
 
         [Command("customize")]
         [Summary("Customizes an item and prints the hex code.")]
-        public async Task CustomizeAsync(string itemHex, int sum)
+        public async Task CustomizeAsync([Summary("Item ID (in hex)")]string itemHex, [Summary("Customization value sum")]int sum)
         {
             ushort itemID = GetID(itemHex);
             if (itemID == Item.NONE)
@@ -170,13 +170,17 @@ namespace SysBot.AnimalCrossing
                 return string.Empty;
 
             var info = ItemRemakeInfoData.List[remake];
-            var body = info.GetBodySummary(GameInfo.Strings);
+            return GetItemInfo(info, GameInfo.Strings);
+        }
 
+        private static string GetItemInfo(ItemRemakeInfo info, IRemakeString str)
+        {
             var sb = new StringBuilder();
+            var body = info.GetBodySummary(str);
             if (body.Length > 0)
                 sb.AppendLine(body);
 
-            var fabric = info.GetFabricSummary(GameInfo.Strings);
+            var fabric = info.GetFabricSummary(str);
             if (fabric.Length > 0)
                 sb.AppendLine(fabric);
 
