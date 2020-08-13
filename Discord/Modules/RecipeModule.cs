@@ -1,0 +1,89 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using NHSE.Core;
+
+namespace SysBot.AnimalCrossing
+{
+    public class RecipeModule : ModuleBase<SocketCommandContext>
+    {
+        private static readonly IReadOnlyDictionary<ushort, ushort> InvertedRecipeDictionary =
+            RecipeList.Recipes.ToDictionary(z => z.Value, z => z.Key);
+
+        [Command("recipeLang")]
+        [Alias("rl")]
+        [Summary("Gets a list of DIY recipe IDs that contain the requested Item Name string.")]
+        public async Task SearchItemsAsync([Summary("Language code to search with")] string language, [Summary("Item name / item substring")][Remainder] string itemName)
+        {
+            var strings = GameInfo.GetStrings(language).ItemDataSource;
+            await PrintItemsAsync(itemName, strings).ConfigureAwait(false);
+        }
+
+        [Command("recipe")]
+        [Alias("ri")]
+        [Summary("Gets a list of DIY recipe IDs that contain the requested Item Name string.")]
+        public async Task SearchItemsAsync([Summary("Item name / item substring")][Remainder] string itemName)
+        {
+            var strings = GameInfo.Strings.ItemDataSource;
+            await PrintItemsAsync(itemName, strings).ConfigureAwait(false);
+        }
+
+        private async Task PrintItemsAsync(string itemName, IReadOnlyList<ComboItem> strings)
+        {
+            const int minLength = 2;
+            if (itemName.Length <= minLength)
+            {
+                await ReplyAsync($"Please enter a search term longer than {minLength} characters.").ConfigureAwait(false);
+                return;
+            }
+
+            foreach (var item in strings)
+            {
+                if (!string.Equals(item.Text, itemName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (!InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
+                {
+                    await ReplyAsync("Requested item is not a DIY recipe.").ConfigureAwait(false);
+                    return;
+                }
+
+                var msg = $"{item.Value:X4} {item.Text}: Recipe {recipeID:X3}";
+                await ReplyAsync(Format.Code(msg)).ConfigureAwait(false);
+                return;
+            }
+
+            var ci = CultureInfo.InvariantCulture.CompareInfo;
+            var matches = new List<string>();
+            foreach (var item in strings)
+            {
+                var isMatch = ci.IndexOf(item.Text, itemName, CompareOptions.OrdinalIgnoreCase);
+                if (isMatch == -1)
+                    continue;
+
+                if (!InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
+                    continue;
+
+                var msg = $"{item.Value:X4} {item.Text}: Recipe {recipeID:X3}";
+                matches.Add(msg);
+            }
+
+            var result = string.Join(Environment.NewLine, matches);
+            if (result.Length == 0)
+            {
+                await ReplyAsync("No matches found.").ConfigureAwait(false);
+                return;
+            }
+
+            const int maxLength = 500;
+            if (result.Length > maxLength)
+                result = result.Substring(0, maxLength) + "...[truncated]";
+
+            await ReplyAsync(Format.Code(result)).ConfigureAwait(false);
+        }
+    }
+}
