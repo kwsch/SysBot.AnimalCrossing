@@ -17,6 +17,9 @@ namespace SysBot.AnimalCrossing
                 if (!parse || val > 0x420)
                     throw new Exception($"Item value out of expected range ({text}).");
 
+                if (!RecipeList.Recipes.TryGetValue((ushort)val, out _))
+                    throw new Exception($"DIY recipe appears to be invalid ({text}).");
+
                 result[i] = new Item(Item.DIYRecipe) { Count = (ushort)val };
             }
             return result;
@@ -24,12 +27,20 @@ namespace SysBot.AnimalCrossing
 
         public static IReadOnlyCollection<Item> GetItems(IReadOnlyList<string> split, IConfigItem config)
         {
+            var strings = GameInfo.Strings.itemlistdisplay;
             var result = new Item[split.Count];
             for (int i = 0; i < result.Length; i++)
             {
                 var text = split[i];
                 var convert = GetBytesFromString(text);
-                result[i] = CreateItem(convert, i, config);
+                var item = CreateItem(convert, i, config);
+
+                if (item.ItemId >= strings.Length)
+                    throw new Exception($"Item requested is out of expected range ({item.ItemId:X4} > {strings.Length:X4}).");
+                if (string.IsNullOrWhiteSpace(strings[item.ItemId]))
+                    throw new Exception($"Item requested does not have a valid name ({item.ItemId:X4}).");
+
+                result[i] = item;
             }
             return result;
         }
