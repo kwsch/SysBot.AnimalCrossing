@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -38,18 +37,15 @@ namespace SysBot.AnimalCrossing
                 return;
             }
 
-            foreach (var item in strings)
+            var exact = ItemUtil.GetItem(itemName, strings);
+            if (!exact.IsNone)
             {
-                if (!string.Equals(item.Text, itemName, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                var msg = $"{item.Value:X4} {item.Text}";
+                var msg = $"{exact.ItemId:X4} {itemName}";
                 await ReplyAsync(Format.Code(msg)).ConfigureAwait(false);
                 return;
             }
 
-            var ci = CultureInfo.InvariantCulture.CompareInfo;
-            var matches = strings.Where(z => ci.IndexOf(z.Text, itemName, CompareOptions.OrdinalIgnoreCase) >= 0).ToArray();
+            var matches = ItemUtil.GetItemsMatching(itemName, strings).ToArray();
             var result = string.Join(Environment.NewLine, matches.Select(z => $"{z.Value:X4} {z.Text}"));
 
             if (result.Length == 0)

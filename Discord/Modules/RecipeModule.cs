@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -53,14 +53,10 @@ namespace SysBot.AnimalCrossing
                 return;
             }
 
-            var ci = CultureInfo.InvariantCulture.CompareInfo;
+            var items = ItemUtil.GetItemsMatching(itemName, strings).ToArray();
             var matches = new List<string>();
-            foreach (var item in strings)
+            foreach (var item in items)
             {
-                var isMatch = ci.IndexOf(item.Text, itemName, CompareOptions.OrdinalIgnoreCase);
-                if (isMatch == -1)
-                    continue;
-
                 if (!DropUtil.InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
                     continue;
 

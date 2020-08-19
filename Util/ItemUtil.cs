@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using NHSE.Core;
@@ -7,17 +8,47 @@ namespace SysBot.AnimalCrossing
 {
     public static class ItemUtil
     {
-        public static Item GetItem(string name, string lang = "en")
+        public static CompareInfo Comparer = CultureInfo.InvariantCulture.CompareInfo;
+        private const CompareOptions opt = CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreSymbols | CompareOptions.IgnoreWidth;
+
+        public static Item GetItem(string itemName, string lang = "en")
         {
             var strings = GameInfo.GetStrings(lang).ItemDataSource;
+            return GetItem(itemName, strings);
+        }
+
+        public static Item GetItem(string itemName, IEnumerable<ComboItem> strings)
+        {
+            if (TryGetItem(itemName, strings, out var id))
+                return new Item(id);
+            return Item.NO_ITEM;
+        }
+
+        public static bool TryGetItem(string itemName, IEnumerable<ComboItem> strings, out ushort value)
+        {
             foreach (var item in strings)
             {
-                if (!string.Equals(item.Text, name, StringComparison.OrdinalIgnoreCase))
+                var result = Comparer.Compare(item.Text, 0, itemName, 0, opt);
+                if (result != 0)
                     continue;
 
-                return new Item((ushort)item.Value);
+                value = (ushort)item.Value;
+                return true;
             }
-            return Item.NO_ITEM;
+
+            value = 0;
+            return false;
+        }
+
+        public static IEnumerable<ComboItem> GetItemsMatching(string itemName, IReadOnlyList<ComboItem> strings)
+        {
+            foreach (var item in strings)
+            {
+                var result = Comparer.Compare(item.Text, 0, itemName, 0, opt);
+                if (result != 0)
+                    continue;
+                yield return item;
+            }
         }
 
         public static string GetItemText(Item item)

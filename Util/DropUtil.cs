@@ -49,7 +49,7 @@ namespace SysBot.AnimalCrossing
             for (int i = 0; i < result.Length; i++)
             {
                 var text = split[i].Trim();
-                bool parse = ulong.TryParse(text, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out var val);
+                bool parse = ulong.TryParse(text, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out var val);
                 if (!parse || val > 0x420)
                     throw new Exception($"Item value out of expected range ({text}).");
 
