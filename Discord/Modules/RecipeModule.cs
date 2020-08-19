@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -11,9 +10,6 @@ namespace SysBot.AnimalCrossing
 {
     public class RecipeModule : ModuleBase<SocketCommandContext>
     {
-        private static readonly IReadOnlyDictionary<ushort, ushort> InvertedRecipeDictionary =
-            RecipeList.Recipes.ToDictionary(z => z.Value, z => z.Key);
-
         [Command("recipeLang")]
         [Alias("rl")]
         [Summary("Gets a list of DIY recipe IDs that contain the requested Item Name string.")]
@@ -24,7 +20,7 @@ namespace SysBot.AnimalCrossing
         }
 
         [Command("recipe")]
-        [Alias("ri")]
+        [Alias("ri", "searchDIY")]
         [Summary("Gets a list of DIY recipe IDs that contain the requested Item Name string.")]
         public async Task SearchItemsAsync([Summary("Item name / item substring")][Remainder] string itemName)
         {
@@ -46,7 +42,7 @@ namespace SysBot.AnimalCrossing
                 if (!string.Equals(item.Text, itemName, StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                if (!InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
+                if (!DropUtil.InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
                 {
                     await ReplyAsync("Requested item is not a DIY recipe.").ConfigureAwait(false);
                     return;
@@ -65,7 +61,7 @@ namespace SysBot.AnimalCrossing
                 if (isMatch == -1)
                     continue;
 
-                if (!InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
+                if (!DropUtil.InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
                     continue;
 
                 var msg = $"{item.Value:X4} {item.Text}: Recipe {recipeID:X3}";

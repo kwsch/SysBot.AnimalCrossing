@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -22,7 +21,7 @@ namespace SysBot.AnimalCrossing
         }
 
         [Command("lookup")]
-        [Alias("li")]
+        [Alias("li", "search")]
         [Summary("Gets a list of items that contain the request string.")]
         public async Task SearchItemsAsync([Summary("Item name / item substring")][Remainder]string itemName)
         {
@@ -74,7 +73,7 @@ namespace SysBot.AnimalCrossing
         [Summary("Gets the info for an item.")]
         public async Task GetItemInfoAsync([Summary("Item ID (in hex)")]string itemHex)
         {
-            ushort itemID = GetID(itemHex);
+            ushort itemID = ItemUtil.GetID(itemHex);
             if (itemID == Item.NONE)
             {
                 await ReplyAsync("Invalid item requested.").ConfigureAwait(false);
@@ -82,7 +81,7 @@ namespace SysBot.AnimalCrossing
             }
 
             var name = GameInfo.Strings.GetItemName(itemID);
-            var result = GetItemInfo(itemID);
+            var result = ItemUtil.GetItemInfo(itemID);
             if (result.Length == 0)
                 await ReplyAsync($"No customization data available for the requested item ({name}).").ConfigureAwait(false);
             else
@@ -93,7 +92,7 @@ namespace SysBot.AnimalCrossing
         [Summary("Stacks an item and prints the hex code.")]
         public async Task StackAsync([Summary("Item ID (in hex)")]string itemHex, [Summary("Count of items in the stack")]int count)
         {
-            ushort itemID = GetID(itemHex);
+            ushort itemID = ItemUtil.GetID(itemHex);
             if (itemID == Item.NONE || count < 1 || count > 99)
             {
                 await ReplyAsync("Invalid item requested.").ConfigureAwait(false);
@@ -102,7 +101,7 @@ namespace SysBot.AnimalCrossing
 
             var ct = count - 1; // value 0 => count of 1
             var item = new Item(itemID) {Count = (ushort)ct};
-            var msg = GetItemText(item);
+            var msg = ItemUtil.GetItemText(item);
             await ReplyAsync(msg).ConfigureAwait(false);
         }
 
@@ -110,7 +109,7 @@ namespace SysBot.AnimalCrossing
         [Summary("Customizes an item and prints the hex code.")]
         public async Task CustomizeAsync([Summary("Item ID (in hex)")]string itemHex, [Summary("Customization value sum")]int sum)
         {
-            ushort itemID = GetID(itemHex);
+            ushort itemID = ItemUtil.GetID(itemHex);
             if (itemID == Item.NONE)
             {
                 await ReplyAsync("Invalid item requested.").ConfigureAwait(false);
@@ -145,46 +144,8 @@ namespace SysBot.AnimalCrossing
                 await ReplyAsync("Requested customization for item appears to be invalid.").ConfigureAwait(false);
 
             var item = new Item(itemID) {BodyType = body, PatternChoice = fabric};
-            var msg = GetItemText(item);
+            var msg = ItemUtil.GetItemText(item);
             await ReplyAsync(msg).ConfigureAwait(false);
-        }
-
-        private static string GetItemText(Item item)
-        {
-            var value = BitConverter.ToUInt64(item.ToBytesClass(), 0);
-            var name = GameInfo.Strings.GetItemName(item.ItemId);
-            return $"{name}: {value:X16}";
-        }
-
-        private static ushort GetID(string text)
-        {
-            if (!ulong.TryParse(text.Trim(), NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out var val))
-                return Item.NONE;
-            return (ushort)val;
-        }
-
-        public static string GetItemInfo(ushort itemID)
-        {
-            var remake = ItemRemakeUtil.GetRemakeIndex(itemID);
-            if (remake < 0)
-                return string.Empty;
-
-            var info = ItemRemakeInfoData.List[remake];
-            return GetItemInfo(info, GameInfo.Strings);
-        }
-
-        private static string GetItemInfo(ItemRemakeInfo info, IRemakeString str)
-        {
-            var sb = new StringBuilder();
-            var body = info.GetBodySummary(str);
-            if (body.Length > 0)
-                sb.AppendLine(body);
-
-            var fabric = info.GetFabricSummary(str);
-            if (fabric.Length > 0)
-                sb.AppendLine(fabric);
-
-            return sb.ToString();
         }
     }
 }

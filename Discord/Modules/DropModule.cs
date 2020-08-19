@@ -37,8 +37,8 @@ namespace SysBot.AnimalCrossing
         [Summary("Drops a custom item (or items).")]
         public async Task RequestDropAsync([Summary("Item ID (in hex). To request multiple, use spaces between item requests.")][Remainder]string request)
         {
-            var split = request.Split(new[] { " ", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-            var items = DropUtil.GetItems(split, Globals.Bot.Config);
+            var cfg = Globals.Bot.Config;
+            var items = DropUtil.GetItemsFromUserInput(request, cfg);
             await DropItems(items).ConfigureAwait(false);
         }
 
@@ -47,8 +47,7 @@ namespace SysBot.AnimalCrossing
         [Summary("Drops a DIY recipe with the requested recipe ID(s).")]
         public async Task RequestDropDIYAsync([Summary("DIY recipe ID (in hex). To request multiple, use spaces between item requests.")][Remainder]string recipeIDs)
         {
-            var split = recipeIDs.Split(new[] { " ", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-            var items = DropUtil.GetDIYItems(split);
+            var items = DropUtil.GetDIYsFromUserInput(recipeIDs);
             await DropItems(items).ConfigureAwait(false);
         }
 
