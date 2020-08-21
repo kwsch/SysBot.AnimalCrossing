@@ -44,8 +44,8 @@ namespace SysBot.AnimalCrossing
         {
             foreach (var item in strings)
             {
-                var result = Comparer.Compare(item.Text, 0, itemName, 0, opt);
-                if (result != 0)
+                var result = Comparer.IndexOf(item.Text, itemName, opt);
+                if (result < 0)
                     continue;
                 yield return item;
             }
