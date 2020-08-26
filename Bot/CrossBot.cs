@@ -18,7 +18,7 @@ namespace SysBot.AnimalCrossing
         protected override async Task MainLoop(CancellationToken token)
         {
             // Disconnect our virtual controller; will reconnect once we send a button command after a request.
-            LogUtil.LogInfo("Detatching controller on startup as first interaction.", Config.IP);
+            LogUtil.LogInfo("Detaching controller on startup as first interaction.", Config.IP);
             await Connection.SendAsync(SwitchCommand.DetachController(), token);
             await Task.Delay(200, token).ConfigureAwait(false);
 

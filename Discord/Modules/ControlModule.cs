@@ -7,12 +7,12 @@ namespace SysBot.AnimalCrossing
 {
     public class ControlModule : ModuleBase<SocketCommandContext>
     {
-        [Command("detatch")]
-        [Summary("Detatches the virtual controller so the operator can use their own handheld controller temporarily.")]
+        [Command("detach")]
+        [Summary("Detaches the virtual controller so the operator can use their own handheld controller temporarily.")]
         [RequireSudo]
-        public async Task DetatchAsync()
+        public async Task DetachAsync()
         {
-            await ReplyAsync("A controller detatch request will be executed momentarily.").ConfigureAwait(false);
+            await ReplyAsync("A controller detach request will be executed momentarily.").ConfigureAwait(false);
             var bot = Globals.Bot;
             await bot.Connection.SendAsync(SwitchCommand.DetachController(), CancellationToken.None).ConfigureAwait(false);
         }
