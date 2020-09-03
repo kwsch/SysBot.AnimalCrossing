@@ -103,6 +103,11 @@ namespace SysBot.AnimalCrossing
 
         [Command("customize")]
         [Summary("Customizes an item and prints the hex code.")]
+        public async Task CustomizeAsync([Summary("Item ID (in hex)")] string itemHex, [Summary("First customization value")] int cust1, [Summary("Second customization value")] int cust2)
+            => await CustomizeAsync(itemHex, cust1 + cust2).ConfigureAwait(false);
+
+        [Command("customize")]
+        [Summary("Customizes an item and prints the hex code.")]
         public async Task CustomizeAsync([Summary("Item ID (in hex)")]string itemHex, [Summary("Customization value sum")]int sum)
         {
             ushort itemID = ItemUtil.GetID(itemHex);
