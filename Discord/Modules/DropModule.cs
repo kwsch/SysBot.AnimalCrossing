@@ -42,7 +42,7 @@ namespace SysBot.AnimalCrossing
         public async Task RequestDropAsync([Summary(DropItemSummary)][Remainder]string request)
         {
             var cfg = Globals.Bot.Config;
-            var items = DropUtil.GetItemsFromUserInput(request, cfg);
+            var items = DropUtil.GetItemsFromUserInput(request, cfg.DropConfig);
             await DropItems(items).ConfigureAwait(false);
         }
 

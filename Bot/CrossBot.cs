@@ -12,22 +12,21 @@ namespace SysBot.AnimalCrossing
         public bool CleanRequested { private get; set; }
         public string DodoCode { get; set; } = "No code set yet.";
 
-        public CrossBot(CrossBotConfig cfg) : base(cfg) { }
+        public CrossBot(CrossBotConfig cfg) : base(cfg) => State = new DropBotState(cfg.DropConfig);
+        public readonly DropBotState State;
+
         public override void SoftStop() => Config.AcceptingCommands = false;
 
         protected override async Task MainLoop(CancellationToken token)
         {
             // Disconnect our virtual controller; will reconnect once we send a button command after a request.
             LogUtil.LogInfo("Detaching controller on startup as first interaction.", Config.IP);
-            await Connection.SendAsync(SwitchCommand.DetachController(), token);
+            await Connection.SendAsync(SwitchCommand.DetachController(), token).ConfigureAwait(false);
             await Task.Delay(200, token).ConfigureAwait(false);
 
             // Validate inventory offset.
             LogUtil.LogInfo("Checking inventory offset for validity.", Config.IP);
-            var (ofs, len) = InventoryValidator.GetOffsetLength(Config.Offset);
-            var inventory = await Connection.ReadBytesAsync(ofs, len, token).ConfigureAwait(false);
-
-            bool valid = InventoryValidator.ValidateItemBinary(inventory);
+            var valid = await GetIsPlayerInventoryValid(Config.Offset, token).ConfigureAwait(false);
             if (!valid)
             {
                 LogUtil.LogInfo($"Inventory read from {Config.Offset} does not appear to be valid. Exiting!", Config.IP);
@@ -35,37 +34,45 @@ namespace SysBot.AnimalCrossing
             }
 
             LogUtil.LogInfo("Successfully connected to bot. Starting main loop!", Config.IP);
-            int dropCount = 0;
-            int idleCount = 0;
             while (!token.IsCancellationRequested)
-            {
-                if (!Config.AcceptingCommands)
-                {
-                    await Task.Delay(1_000, token).ConfigureAwait(false);
-                    continue;
-                }
+                await DropLoop(token).ConfigureAwait(false);
+        }
 
-                if (Injections.TryDequeue(out var item))
-                {
-                    dropCount += await DropItems(item, token).ConfigureAwait(false);
-                    idleCount = 0;
-                }
-                else if ((Config.AutoClean && dropCount != 0 && ++idleCount > 60) || CleanRequested)
-                {
-                    await CleanUp(token).ConfigureAwait(false);
-                    dropCount = 0;
-                    idleCount = 0;
-                    CleanRequested = false;
-                }
-                else
-                {
-                    idleCount++;
-                    await Task.Delay(1_000, token).ConfigureAwait(false);
-                }
+        private async Task DropLoop(CancellationToken token)
+        {
+            if (!Config.AcceptingCommands)
+            {
+                await Task.Delay(1_000, token).ConfigureAwait(false);
+                return;
+            }
+
+            if (Injections.TryDequeue(out var item))
+            {
+                var count = await DropItems(item, token).ConfigureAwait(false);
+                State.AfterDrop(count);
+            }
+            else if ((State.CleanRequired && State.Config.AutoClean) || CleanRequested)
+            {
+                await CleanUp(State.Config.PickupCount, token).ConfigureAwait(false);
+                State.AfterClean();
+                CleanRequested = false;
+            }
+            else
+            {
+                State.StillIdle();
+                await Task.Delay(1_000, token).ConfigureAwait(false);
             }
         }
 
-        public async Task<int> DropItems(ItemRequest drop, CancellationToken token)
+        private async Task<bool> GetIsPlayerInventoryValid(uint playerOfs, CancellationToken token)
+        {
+            var (ofs, len) = InventoryValidator.GetOffsetLength(playerOfs);
+            var inventory = await Connection.ReadBytesAsync(ofs, len, token).ConfigureAwait(false);
+
+            return InventoryValidator.ValidateItemBinary(inventory);
+        }
+
+        private async Task<int> DropItems(ItemRequest drop, CancellationToken token)
         {
             int dropped = 0;
             bool first = true;
@@ -93,7 +100,7 @@ namespace SysBot.AnimalCrossing
             // Inject item.
             var data = item.ToBytesClass();
             var poke = SwitchCommand.Poke(Config.Offset, data);
-            await Connection.SendAsync(poke, token);
+            await Connection.SendAsync(poke, token).ConfigureAwait(false);
             await Task.Delay(0_300, token).ConfigureAwait(false);
 
             // Open player inventory and open the currently selected item slot -- assumed to be the config offset.
@@ -114,9 +121,7 @@ namespace SysBot.AnimalCrossing
                 await Click(SwitchButton.B, 0_400, token).ConfigureAwait(false);
         }
 
-        private const int PickupCount = 5;
-
-        private async Task CleanUp(CancellationToken token)
+        private async Task CleanUp(int count, CancellationToken token)
         {
             LogUtil.LogInfo("Picking up leftover items during idle time.", Config.IP);
 
@@ -125,11 +130,11 @@ namespace SysBot.AnimalCrossing
                 await Click(SwitchButton.B, 0_400, token).ConfigureAwait(false);
 
             // Pick up and delete.
-            for (int i = 0; i < PickupCount; i++)
+            for (int i = 0; i < count; i++)
             {
                 await Click(SwitchButton.Y, 2_000, token).ConfigureAwait(false);
                 var poke = SwitchCommand.Poke(Config.Offset, Item.NONE.ToBytes());
-                await Connection.SendAsync(poke, token);
+                await Connection.SendAsync(poke, token).ConfigureAwait(false);
                 await Task.Delay(1_000, token).ConfigureAwait(false);
             }
         }

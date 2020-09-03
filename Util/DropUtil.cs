@@ -11,7 +11,7 @@ namespace SysBot.AnimalCrossing
         public static readonly IReadOnlyDictionary<ushort, ushort> InvertedRecipeDictionary =
             RecipeList.Recipes.ToDictionary(z => z.Value, z => z.Key);
 
-        public static IReadOnlyCollection<Item> GetItemsFromUserInput(string request, CrossBotConfig cfg)
+        public static IReadOnlyCollection<Item> GetItemsFromUserInput(string request, IConfigItem cfg)
         {
             try
             {

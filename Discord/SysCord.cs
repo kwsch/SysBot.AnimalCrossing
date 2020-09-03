@@ -155,7 +155,7 @@ namespace SysBot.AnimalCrossing
             // should this be a service?
             if (msg.Attachments.Count > 0)
             {
-                await Task.CompletedTask;
+                await Task.CompletedTask.ConfigureAwait(false);
             }
         }
 

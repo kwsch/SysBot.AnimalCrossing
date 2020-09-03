@@ -33,8 +33,10 @@ namespace SysBot.AnimalCrossing
             }
 
             LogUtil.LogInfo("Starting bot loop.", bot.Connection.IP);
+
             var task = bot.RunAsync(cancel);
-            await task;
+            await task.ConfigureAwait(false);
+
             if (task.IsFaulted)
             {
                 if (task.Exception == null)
