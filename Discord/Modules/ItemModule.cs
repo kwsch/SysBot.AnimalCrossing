@@ -138,8 +138,9 @@ namespace SysBot.AnimalCrossing
             }
 
             var info = ItemRemakeInfoData.List[remake];
-            bool hasBody = body == 0 || (body <= 7 && body <= info.ReBodyPatternNum);
-            bool hasFabric = fabric == 0 || (fabric <= 7 && info.GetFabricDescription(fabric) != "Invalid");
+            // already checked out-of-range body/fabric values above
+            bool hasBody = body == 0 || body <= info.ReBodyPatternNum;
+            bool hasFabric = fabric == 0 || info.GetFabricDescription(fabric) != "Invalid";
 
             if (!hasBody || !hasFabric)
                 await ReplyAsync("Requested customization for item appears to be invalid.").ConfigureAwait(false);
