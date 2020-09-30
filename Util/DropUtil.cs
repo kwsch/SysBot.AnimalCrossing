@@ -142,7 +142,7 @@ namespace SysBot.AnimalCrossing
             if (item.IsNone)
                 throw new Exception($"Failed to convert item {i}:{name} for Language {lang}.");
 
-            if (!IsSaneItem(item))
+            if (!IsSaneItemForDrop(item))
                 throw new Exception($"Unsupported item: {i}:{name}");
 
             if (config.WrapAllItems && item.ShouldWrapItem())
@@ -163,7 +163,7 @@ namespace SysBot.AnimalCrossing
                 throw new Exception($"Failed to convert item {i}: {ex.Message}");
             }
 
-            if (!IsSaneItem(item) || convert.Length != Item.SIZE)
+            if (!IsSaneItemForDrop(item) || convert.Length != Item.SIZE)
                 throw new Exception($"Unsupported item: {i}");
 
             if (config.WrapAllItems && item.ShouldWrapItem())
@@ -171,17 +171,12 @@ namespace SysBot.AnimalCrossing
             return item;
         }
 
-        private static bool IsSaneItem(Item item)
+        private static bool IsSaneItemForDrop(Item item)
         {
-            if (item.IsFieldItem)
+            if (!ItemUtil.IsDroppable(item))
                 return false;
-            if (item.IsExtension)
-                return false;
-            if (item.IsNone)
-                return false;
-            if (item.SystemParam > 3)
-                return false; // buried, dropped, etc
 
+            // Sanitize Values
             if (item.ItemId == Item.MessageBottle || item.ItemId == Item.MessageBottleEgg)
             {
                 item.ItemId = Item.DIYRecipe;

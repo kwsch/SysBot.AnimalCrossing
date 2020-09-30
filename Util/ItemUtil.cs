@@ -8,7 +8,7 @@ namespace SysBot.AnimalCrossing
 {
     public static class ItemUtil
     {
-        public static CompareInfo Comparer = CultureInfo.InvariantCulture.CompareInfo;
+        private static readonly CompareInfo Comparer = CultureInfo.InvariantCulture.CompareInfo;
         private const CompareOptions opt = CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreSymbols | CompareOptions.IgnoreWidth;
 
         public static Item GetItem(string itemName, string lang = "en")
@@ -96,12 +96,57 @@ namespace SysBot.AnimalCrossing
             if (item.IsWrapped)
                 return 0;
 
-            return 1;
+            var kind = ItemInfo.GetItemKind(item);
+            return kind switch
+            {
+                ItemKind.Kind_DIYRecipe => 1,
+
+                ItemKind.Kind_Flower => 2,
+                _ => 1,
+            };
         }
 
         public static bool ShouldWrapItem(this Item item)
         {
-            return Item.DIYRecipe != item.ItemId;
+            if (Item.DIYRecipe == item.ItemId)
+                return false;
+
+            var kind = ItemInfo.GetItemKind(item);
+            return kind switch
+            {
+                ItemKind.Kind_DIYRecipe => false,
+
+                ItemKind.Kind_Flower => false,
+                _ => true,
+            };
+        }
+
+        public static bool IsDroppable(Item item)
+        {
+            if (item.IsFieldItem)
+                return false;
+            if (item.IsExtension)
+                return false;
+            if (item.IsNone)
+                return false;
+            if (item.SystemParam > 3)
+                return false; // buried, dropped, etc
+
+            var kind = ItemInfo.GetItemKind(item);
+            return kind switch
+            {
+                ItemKind.Kind_Insect => false,
+
+                ItemKind.Kind_DummyPresentbox => false,
+
+                ItemKind.Kind_Fish => false,
+                ItemKind.Kind_DiveFish => false,
+                ItemKind.Kind_FlowerBud => false,
+                ItemKind.Kind_Bush => false,
+                ItemKind.Kind_Tree => false,
+
+                _ => true,
+            };
         }
     }
 }
