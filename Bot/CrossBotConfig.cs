@@ -37,7 +37,7 @@ namespace SysBot.AnimalCrossing
         public bool SkipConsoleBotCreation { get; set; }
 
         /// <summary> Offset the items are injected at. This should be the player inventory slot you have currently selected in-game. </summary>
-        public uint Offset { get; set; } = 0xABADD888;
+        public uint Offset { get; set; } = 0xABC25840;
 
         public DropBotConfig DropConfig { get; set; } = new DropBotConfig();
 
