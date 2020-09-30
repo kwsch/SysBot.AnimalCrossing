@@ -29,8 +29,12 @@ namespace SysBot.AnimalCrossing
             var valid = await GetIsPlayerInventoryValid(Config.Offset, token).ConfigureAwait(false);
             if (!valid)
             {
-                LogUtil.LogInfo($"Inventory read from {Config.Offset} does not appear to be valid. Exiting!", Config.IP);
-                return;
+                LogUtil.LogInfo($"Inventory read from {Config.Offset} (0x{Config.Offset:X8}) does not appear to be valid.", Config.IP);
+                if (Config.RequireValidInventoryMetadata)
+                {
+                    LogUtil.LogInfo("Exiting!", Config.IP);
+                    return;
+                }
             }
 
             LogUtil.LogInfo("Successfully connected to bot. Starting main loop!", Config.IP);
