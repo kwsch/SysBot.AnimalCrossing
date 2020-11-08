@@ -12,6 +12,7 @@ namespace SysBot.AnimalCrossing
 
         [Command("clean")]
         [Summary("Picks up items around the bot.")]
+        [RequireQueueRole(nameof(Globals.Bot.Config.RoleCustom))]
         public async Task RequestCleanAsync()
         {
             if (!Globals.Bot.Config.AllowClean)
@@ -26,6 +27,7 @@ namespace SysBot.AnimalCrossing
         [Command("code")]
         [Alias("dodo")]
         [Summary("Prints the Dodo Code for the island.")]
+        [RequireQueueRole(nameof(Globals.Bot.Config.RoleCustom))]
         public async Task RequestDodoCodeAsync()
         {
             await ReplyAsync($"Dodo Code: {Globals.Bot.DodoCode}.").ConfigureAwait(false);
@@ -39,6 +41,7 @@ namespace SysBot.AnimalCrossing
         [Command("dropItem")]
         [Alias("drop")]
         [Summary("Drops a custom item (or items).")]
+        [RequireQueueRole(nameof(Globals.Bot.Config.RoleCustom))]
         public async Task RequestDropAsync([Summary(DropItemSummary)][Remainder]string request)
         {
             var cfg = Globals.Bot.Config;
@@ -54,6 +57,7 @@ namespace SysBot.AnimalCrossing
         [Command("dropDIY")]
         [Alias("diy")]
         [Summary("Drops a DIY recipe with the requested recipe ID(s).")]
+        [RequireQueueRole(nameof(Globals.Bot.Config.RoleCustom))]
         public async Task RequestDropDIYAsync([Summary(DropDIYSummary)][Remainder]string recipeIDs)
         {
             var items = DropUtil.GetDIYsFromUserInput(recipeIDs);

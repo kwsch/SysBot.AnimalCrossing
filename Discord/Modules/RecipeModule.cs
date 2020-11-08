@@ -13,6 +13,7 @@ namespace SysBot.AnimalCrossing
         [Command("recipeLang")]
         [Alias("rl")]
         [Summary("Gets a list of DIY recipe IDs that contain the requested Item Name string.")]
+        [RequireQueueRole(nameof(Globals.Bot.Config.RoleCustom))]
         public async Task SearchItemsAsync([Summary("Language code to search with")] string language, [Summary("Item name / item substring")][Remainder] string itemName)
         {
             var strings = GameInfo.GetStrings(language).ItemDataSource;
@@ -22,6 +23,7 @@ namespace SysBot.AnimalCrossing
         [Command("recipe")]
         [Alias("ri", "searchDIY")]
         [Summary("Gets a list of DIY recipe IDs that contain the requested Item Name string.")]
+        [RequireQueueRole(nameof(Globals.Bot.Config.RoleCustom))]
         public async Task SearchItemsAsync([Summary("Item name / item substring")][Remainder] string itemName)
         {
             var strings = GameInfo.Strings.ItemDataSource;

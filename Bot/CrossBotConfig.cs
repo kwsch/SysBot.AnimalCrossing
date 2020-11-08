@@ -21,8 +21,8 @@ namespace SysBot.AnimalCrossing
         /// <summary> Bot command prefix. </summary>
         public string Prefix { get; set; } = "$";
 
-        /// <summary> Users with this role are allowed to request custom items. If empty, anyone can request custom items. </summary>
-        public string RoleCustom { get; set; } = string.Empty;
+        /// <summary> Users with this role are allowed to request custom items. If "@everyone", anyone can request custom items. </summary>
+        public string RoleCustom { get; set; } = "@everyone";
 
         // 64bit numbers white-listing certain channels/users for permission
         public List<ulong> Channels { get; set; } = new List<ulong>();
