@@ -21,7 +21,7 @@ namespace SysBot.AnimalCrossing
         /// <summary> Bot command prefix. </summary>
         public string Prefix { get; set; } = "$";
 
-        /// <summary> Users with this role are allowed to interact with the bot. If "@everyone", anyone can request custom items. </summary>
+        /// <summary> Users with this role are allowed to interact with the bot. If "@everyone", anyone can interact. </summary>
         public string RoleUseBot { get; set; } = "@everyone";
 
         // 64bit numbers white-listing certain channels/users for permission
