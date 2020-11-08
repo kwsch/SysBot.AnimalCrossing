@@ -21,8 +21,8 @@ namespace SysBot.AnimalCrossing
         /// <summary> Bot command prefix. </summary>
         public string Prefix { get; set; } = "$";
 
-        /// <summary> Users with this role are allowed to request custom items. If "@everyone", anyone can request custom items. </summary>
-        public string RoleCustom { get; set; } = "@everyone";
+        /// <summary> Users with this role are allowed to interact with the bot. If "@everyone", anyone can request custom items. </summary>
+        public string RoleUseBot { get; set; } = "@everyone";
 
         // 64bit numbers white-listing certain channels/users for permission
         public List<ulong> Channels { get; set; } = new List<ulong>();
@@ -58,7 +58,7 @@ namespace SysBot.AnimalCrossing
         {
             return roleName switch
             {
-                nameof(RoleCustom) => roles.Contains(RoleCustom),
+                nameof(RoleUseBot) => roles.Contains(RoleUseBot),
                 _ => throw new ArgumentException(nameof(roleName))
             };
         }
