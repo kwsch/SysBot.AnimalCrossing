@@ -1,4 +1,5 @@
-﻿using NHSE.Core;
+﻿using System;
+using NHSE.Core;
 
 namespace SysBot.AnimalCrossing
 {
@@ -35,11 +36,20 @@ namespace SysBot.AnimalCrossing
 
     public class DropBotConfig : IConfigItem
     {
+        private int _maxDropCount = 7;
+
         /// <summary> When enabled, bot picks up items when idle for <see cref="NoActivitySeconds"/> seconds. </summary>
         public bool AutoClean { get; set; }
 
         /// <summary> When <see cref="AutoClean"/> is enabled, the bot will pick up items after the a certain amount of inactive time. </summary>
         public int NoActivitySeconds { get; set; } = 60;
+
+        /// <summary> Amount of times to perform a pick-up item action. </summary>
+        public int MaxDropCount
+        {
+            get => _maxDropCount;
+            set => _maxDropCount = Math.Max(1, Math.Min(40, value));
+        }
 
         /// <summary> Amount of times to perform a pick-up item action. </summary>
         public int PickupCount { get; set; } = 5;

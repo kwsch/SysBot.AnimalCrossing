@@ -8,7 +8,7 @@ namespace SysBot.AnimalCrossing
 {
     public class DropModule : ModuleBase<SocketCommandContext>
     {
-        private const int MaxRequestCount = 7;
+        private int MaxRequestCount => Globals.Bot.Config.DropConfig.MaxDropCount;
 
         [Command("clean")]
         [Summary("Picks up items around the bot.")]
@@ -66,8 +66,7 @@ namespace SysBot.AnimalCrossing
 
         private async Task DropItems(IReadOnlyCollection<Item> items)
         {
-            const int maxRequestCount = 7;
-            if (items.Count > maxRequestCount)
+            if (items.Count > MaxRequestCount)
             {
                 var clamped = $"Users are limited to {MaxRequestCount} items per command. Please use this bot responsibly.";
                 await ReplyAsync(clamped).ConfigureAwait(false);
