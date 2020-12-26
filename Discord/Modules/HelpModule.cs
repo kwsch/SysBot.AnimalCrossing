@@ -6,6 +6,7 @@ using Discord.Commands;
 
 namespace SysBot.AnimalCrossing
 {
+    // ReSharper disable once UnusedType.Global
     public class HelpModule : ModuleBase<SocketCommandContext>
     {
         private readonly CommandService _service;
@@ -32,7 +33,7 @@ namespace SysBot.AnimalCrossing
             foreach (var module in _service.Modules)
             {
                 string? description = null;
-                HashSet<string> mentioned = new HashSet<string>();
+                HashSet<string> mentioned = new();
                 foreach (var cmd in module.Commands)
                 {
                     var name = cmd.Name;

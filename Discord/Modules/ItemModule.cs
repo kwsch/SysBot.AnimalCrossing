@@ -8,6 +8,7 @@ using NHSE.Core;
 
 namespace SysBot.AnimalCrossing
 {
+    // ReSharper disable once UnusedType.Global
     public class ItemModule : ModuleBase<SocketCommandContext>
     {
         [Command("lookupLang")]

@@ -14,6 +14,7 @@ namespace SysBot.AnimalCrossing
     // src: https://github.com/foxbot/patek/blob/master/src/Patek/Modules/InfoModule.cs
     // ISC License (ISC)
     // Copyright 2017, Christopher F. <foxbot@protonmail.com>
+    // ReSharper disable once UnusedType.Global
     public class InfoModule : ModuleBase<SocketCommandContext>
     {
         private const string detail = "I am an open source Discord bot powered by SysBot.NET and other open source software.";

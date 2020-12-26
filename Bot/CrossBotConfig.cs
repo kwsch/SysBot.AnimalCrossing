@@ -5,6 +5,7 @@ using SysBot.Base;
 
 namespace SysBot.AnimalCrossing
 {
+    [Serializable]
     public sealed class CrossBotConfig : SwitchBotConfig
     {
         #region Discord
@@ -25,9 +26,9 @@ namespace SysBot.AnimalCrossing
         public string RoleUseBot { get; set; } = "@everyone";
 
         // 64bit numbers white-listing certain channels/users for permission
-        public List<ulong> Channels { get; set; } = new List<ulong>();
-        public List<ulong> Users { get; set; } = new List<ulong>();
-        public List<ulong> Sudo { get; set; } = new List<ulong>();
+        public List<ulong> Channels { get; set; } = new();
+        public List<ulong> Users { get; set; } = new();
+        public List<ulong> Sudo { get; set; } = new();
 
         #endregion
 
@@ -43,7 +44,7 @@ namespace SysBot.AnimalCrossing
         /// <remarks> Only disable this as a last resort, and you have corrupted your item metadata through other means. </remarks>
         public bool RequireValidInventoryMetadata { get; set; } = true;
 
-        public DropBotConfig DropConfig { get; set; } = new DropBotConfig();
+        public DropBotConfig DropConfig { get; set; } = new();
 
         /// <summary> When enabled, users in Discord can request the bot to pick up items (spamming Y a <see cref="DropBotConfig.PickupCount"/> times). </summary>
         public bool AllowClean { get; set; }
@@ -59,7 +60,7 @@ namespace SysBot.AnimalCrossing
             return roleName switch
             {
                 nameof(RoleUseBot) => roles.Contains(RoleUseBot),
-                _ => throw new ArgumentException(nameof(roleName))
+                _ => throw new ArgumentException($"{roleName} is not a valid role type.", nameof(roleName)),
             };
         }
     }

@@ -8,8 +8,8 @@ namespace SysBot.AnimalCrossing
 {
     public static class Globals
     {
-        public static SysCord Self = default!;
-        public static CrossBot Bot = default!;
+        public static SysCord Self { get; set; } = default!;
+        public static CrossBot Bot { get; set; } = default!;
     }
 
     public sealed class RequireQueueRoleAttribute : PreconditionAttribute
@@ -27,7 +27,7 @@ namespace SysBot.AnimalCrossing
                 return Task.FromResult(PreconditionResult.FromSuccess());
 
             // Check if this user is a Guild User, which is the only context where roles exist
-            if (!(context.User is SocketGuildUser gUser))
+            if (context.User is not SocketGuildUser gUser)
                 return Task.FromResult(PreconditionResult.FromError("You must be in a guild to run this command."));
 
             if (!mgr.AcceptingCommands)

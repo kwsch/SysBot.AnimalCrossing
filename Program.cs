@@ -24,12 +24,16 @@ namespace SysBot.AnimalCrossing
 
             var json = File.ReadAllText(ConfigPath);
             var config = JsonSerializer.Deserialize<CrossBotConfig>(json);
+            if (config == null)
+            {
+                Console.WriteLine("Failed to deserialize configuration file.");
+                WaitKeyExit();
+                return;
+            }
+
             SaveConfig(config);
-
             await BotRunner.RunFrom(config, CancellationToken.None).ConfigureAwait(false);
-
-            Console.WriteLine("Press any key to exit.");
-            Console.ReadKey();
+            WaitKeyExit();
         }
 
         private static void SaveConfig(CrossBotConfig config)
@@ -43,6 +47,11 @@ namespace SysBot.AnimalCrossing
         {
             SaveConfig(new CrossBotConfig {IP = "192.168.0.1", Port = 6000});
             Console.WriteLine("Created blank config file. Please configure it and restart the program.");
+            WaitKeyExit();
+        }
+
+        private static void WaitKeyExit()
+        {
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
         }

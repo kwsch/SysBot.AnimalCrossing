@@ -6,9 +6,10 @@ using NHSE.Core;
 
 namespace SysBot.AnimalCrossing
 {
+    // ReSharper disable once UnusedType.Global
     public class DropModule : ModuleBase<SocketCommandContext>
     {
-        private int MaxRequestCount => Globals.Bot.Config.DropConfig.MaxDropCount;
+        private static int MaxRequestCount => Globals.Bot.Config.DropConfig.MaxDropCount;
 
         [Command("clean")]
         [Summary("Picks up items around the bot.")]

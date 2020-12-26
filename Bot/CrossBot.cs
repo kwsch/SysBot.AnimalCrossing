@@ -8,7 +8,7 @@ namespace SysBot.AnimalCrossing
 {
     public sealed class CrossBot : SwitchRoutineExecutor<CrossBotConfig>
     {
-        public readonly ConcurrentQueue<ItemRequest> Injections = new ConcurrentQueue<ItemRequest>();
+        public readonly ConcurrentQueue<ItemRequest> Injections = new();
         public bool CleanRequested { private get; set; }
         public string DodoCode { get; set; } = "No code set yet.";
 

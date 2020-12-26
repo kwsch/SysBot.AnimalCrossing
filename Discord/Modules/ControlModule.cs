@@ -5,6 +5,7 @@ using SysBot.Base;
 
 namespace SysBot.AnimalCrossing
 {
+    // ReSharper disable once UnusedType.Global
     public class ControlModule : ModuleBase<SocketCommandContext>
     {
         [Command("detach")]
