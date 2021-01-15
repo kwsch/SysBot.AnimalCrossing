@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog" Version="4.7.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CrossBot.Core\CrossBot.Core.csproj" />
   </ItemGroup>
 
