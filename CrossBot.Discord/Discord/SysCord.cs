@@ -27,6 +27,8 @@ namespace CrossBot.Discord
         {
             Bot = bot;
             Config = cfg;
+            Globals.Self = this;
+            Globals.Bot = bot;
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 // How much logging do you want to see?
