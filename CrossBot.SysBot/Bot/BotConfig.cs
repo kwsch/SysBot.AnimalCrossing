@@ -3,6 +3,9 @@ using SysBot.Base;
 
 namespace CrossBot.SysBot
 {
+    /// <summary>
+    /// Serialized configuration for the <see cref="Bot"/>, containing overall permissions and setup parameters.
+    /// </summary>
     [Serializable]
     public sealed class BotConfig : SwitchBotConfig
     {
@@ -31,5 +34,20 @@ namespace CrossBot.SysBot
         /// If <see cref="RequireValidInventoryMetadata"/> is enabled and validation fails, the bot will set <see cref="AcceptingCommands"/> to false.
         /// </remarks>
         public bool AllowValidate { get; set; } = true;
+
+        /// <summary>
+        /// Tries to restart the bot if it has crashed.
+        /// </summary>
+        public bool RestartOnCrash { get; set; } = true;
+
+        /// <summary>
+        /// Amount of time to try restarting the bot in the event of it crashing.
+        /// </summary>
+        public int MaximumRestarts { get; set; } = 20;
+
+        /// <summary>
+        /// Amount of up-time (in seconds) to determine if the bot is running without fault.
+        /// </summary>
+        public int UptimeThreshold { get; set; } = 60;
     }
 }
