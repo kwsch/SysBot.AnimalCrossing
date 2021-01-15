@@ -23,5 +23,13 @@ namespace CrossBot.SysBot
 
         /// <summary> When enabled, users in Discord can request the bot to pick up items (spamming Y a <see cref="DropBotConfig.PickupCount"/> times). </summary>
         public bool AllowClean { get; set; }
+
+        /// <summary>
+        /// When enabled, users in Discord can request the bot to validate the inventory offset.
+        /// </summary>
+        /// <remarks>
+        /// If <see cref="RequireValidInventoryMetadata"/> is enabled and validation fails, the bot will set <see cref="AcceptingCommands"/> to false.
+        /// </remarks>
+        public bool AllowValidate { get; set; } = true;
     }
 }

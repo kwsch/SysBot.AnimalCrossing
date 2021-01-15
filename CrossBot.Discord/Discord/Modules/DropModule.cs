@@ -26,6 +26,20 @@ namespace CrossBot.Discord
             await ReplyAsync("A clean request will be executed momentarily.").ConfigureAwait(false);
         }
 
+        [Command("validate")]
+        [Summary("Validates the bot inventory offset again.")]
+        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+        public async Task RequestValidateAsync()
+        {
+            if (!Globals.Bot.Config.AllowValidate)
+            {
+                await ReplyAsync("Validate functionality is currently disabled.").ConfigureAwait(false);
+                return;
+            }
+            Globals.Bot.ValidateRequested = true;
+            await ReplyAsync("A validate request will be executed momentarily. Check the logs for the result.").ConfigureAwait(false);
+        }
+
         [Command("code")]
         [Alias("dodo")]
         [Summary("Prints the Dodo Code for the island.")]

@@ -11,6 +11,7 @@ namespace CrossBot.SysBot
     {
         public readonly ConcurrentQueue<ItemRequest> Injections = new();
         public bool CleanRequested { private get; set; }
+        public bool ValidateRequested { private get; set; }
         public string DodoCode { get; set; } = "No code set yet.";
 
         public Bot(BotConfig cfg) : base(cfg) => State = new DropBotState(cfg.DropConfig);
@@ -45,6 +46,22 @@ namespace CrossBot.SysBot
 
         private async Task DropLoop(CancellationToken token)
         {
+            if (ValidateRequested)
+            {
+                LogUtil.LogInfo("Checking inventory offset for validity.", Config.IP);
+                var valid = await GetIsPlayerInventoryValid(Config.Offset, token).ConfigureAwait(false);
+                if (!valid)
+                {
+                    LogUtil.LogInfo($"Inventory read from {Config.Offset} (0x{Config.Offset:X8}) does not appear to be valid.", Config.IP);
+                    if (Config.RequireValidInventoryMetadata)
+                    {
+                        LogUtil.LogInfo("Turning off command processing!", Config.IP);
+                        Config.AcceptingCommands = false;
+                    }
+                }
+                ValidateRequested = false;
+            }
+
             if (!Config.AcceptingCommands)
             {
                 await Task.Delay(1_000, token).ConfigureAwait(false);
