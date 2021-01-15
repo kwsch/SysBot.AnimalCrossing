@@ -39,6 +39,6 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: SysBot-ACNH'
   inputs:
-    PathtoPublish: 'bin\Release\net47'
+    PathtoPublish: 'CrossBot.ConsoleApp\bin\Release\net47'
     ArtifactName: SysBot-ACNH
   condition: succeededOrFailed()
