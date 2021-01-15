@@ -5,6 +5,9 @@ using Discord.WebSocket;
 
 namespace CrossBot.Discord
 {
+    /// <summary>
+    /// Attribute that requires the command issuer to have elevated permissions.
+    /// </summary>
     public sealed class RequireSudoAttribute : PreconditionAttribute
     {
         // Override the CheckPermissions method

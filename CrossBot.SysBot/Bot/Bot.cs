@@ -7,6 +7,9 @@ using SysBot.Base;
 
 namespace CrossBot.SysBot
 {
+    /// <summary>
+    /// Animal Crossing Drop Bot
+    /// </summary>
     public sealed class Bot : SwitchRoutineExecutor<BotConfig>
     {
         public readonly ConcurrentQueue<ItemRequest> Injections = new();

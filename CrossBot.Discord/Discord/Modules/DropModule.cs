@@ -89,7 +89,8 @@ namespace CrossBot.Discord
                 items = items.Take(MaxRequestCount).ToArray();
             }
 
-            var requestInfo = new ItemRequest(Context.User.Username, items);
+            var user = Context.User;
+            var requestInfo = new ItemRequest(user.Username, user.Id, items);
             Globals.Bot.Injections.Enqueue(requestInfo);
 
             var msg = $"Item drop request{(requestInfo.Items.Count > 1 ? "s" : string.Empty)} will be executed momentarily.";

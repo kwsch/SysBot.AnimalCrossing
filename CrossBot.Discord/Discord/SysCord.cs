@@ -11,6 +11,9 @@ using SysBot.Base;
 
 namespace CrossBot.Discord
 {
+    /// <summary>
+    /// Discord Bot that monitors the <see cref="Bot"/> state and updates its status accordingly.
+    /// </summary>
     public sealed class SysCord
     {
         private readonly DiscordSocketClient _client;
