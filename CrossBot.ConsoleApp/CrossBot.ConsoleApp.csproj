@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net5.0;net47</TargetFrameworks>
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrossBot.Core\CrossBot.Core.csproj" />
+    <ProjectReference Include="..\CrossBot.Discord\CrossBot.Discord.csproj" />
+    <ProjectReference Include="..\CrossBot.SysBot\CrossBot.SysBot.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="NHSE.Core">
+      <HintPath>..\deps\NHSE.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SysBot.Base">
+      <HintPath>..\deps\SysBot.Base.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
