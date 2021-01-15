@@ -3,8 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Threading;
-using CrossBot.Core;
 using CrossBot.Discord;
+using CrossBot.SysBot;
 using SysBot.Base;
 
 namespace CrossBot.ConsoleApp

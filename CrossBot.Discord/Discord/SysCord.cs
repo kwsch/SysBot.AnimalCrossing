@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using CrossBot.Core;
+using CrossBot.SysBot;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;

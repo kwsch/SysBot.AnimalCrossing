@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SysBot.Base;
 
-namespace CrossBot.Core
+namespace CrossBot.SysBot
 {
     public static class BotRunner
     {
