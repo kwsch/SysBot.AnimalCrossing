@@ -24,7 +24,7 @@ namespace CrossBot.Discord
         public async Task SetDodoCodeAsync([Summary("Current Dodo Code for the island.")][Remainder]string code)
         {
             var bot = Globals.Bot;
-            bot.DodoCode = code;
+            bot.Island.DodoCode = code;
             await ReplyAsync($"The dodo code for the bot has been set to {code}.").ConfigureAwait(false);
         }
 

@@ -15,7 +15,7 @@ namespace CrossBot.SysBot
         public readonly ConcurrentQueue<ItemRequest> Injections = new();
         public bool CleanRequested { private get; set; }
         public bool ValidateRequested { private get; set; }
-        public string DodoCode { get; set; } = "No code set yet.";
+        public readonly IslandState Island = new();
 
         public Bot(BotConfig cfg) : base(cfg) => State = new DropBotState(cfg.DropConfig);
         public readonly DropBotState State;

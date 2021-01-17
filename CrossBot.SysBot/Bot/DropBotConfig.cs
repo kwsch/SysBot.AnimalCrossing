@@ -38,5 +38,10 @@ namespace CrossBot.SysBot
 
         /// <summary> Wrapping paper to apply when <see cref="WrapAllItems"/> is true. </summary>
         public ItemWrappingPaper WrappingPaper { get; set; } = ItemWrappingPaper.Black;
+
+        /// <summary>
+        /// Requires users to indicate they've joined the island prior to issuing drop commands.
+        /// </summary>
+        public bool RequireJoin { get; set; } = true;
     }
 }
