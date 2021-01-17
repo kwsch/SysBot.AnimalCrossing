@@ -19,7 +19,7 @@ namespace CrossBot.SysBot
                 return;
             }
 
-            LogUtil.LogInfo("Starting bot loop.", bot.Connection.IP);
+            bot.Log("Starting bot loop.");
             int faultCount = 0;
             while (!cancel.IsCancellationRequested)
             {
@@ -27,7 +27,7 @@ namespace CrossBot.SysBot
                 {
                     await Task.Delay(5_000, cancel).ConfigureAwait(false);
                     bot.CleanRequested = true;
-                    LogUtil.LogInfo("Restarting bot loop.", bot.Connection.IP);
+                    bot.Log("Restarting bot loop.");
                 }
 
                 // Run the bot until the bot task finishes. Depending on the result, we may restart.
@@ -51,28 +51,28 @@ namespace CrossBot.SysBot
                 if (++faultCount <= cfg.MaximumRestarts)
                     continue; // restart loop!
 
-                LogUtil.LogError("Bot has crashed too many times in the current time-window. Stopping execution.", bot.Connection.IP);
+                bot.Connection.LogError("Bot has crashed too many times in the current time-window. Stopping execution.");
                 break; // we're done
             }
 
-            LogUtil.LogInfo("Bot execution has terminated.", bot.Connection.IP);
+            bot.Log("Bot execution has terminated.");
         }
 
-        private static void LogError(SwitchConnectionBase connection, Task task)
+        private static void LogError(IConsoleConnectionAsync connection, Task task)
         {
             if (task.Exception == null)
             {
-                LogUtil.LogError("Bot has crashed due to an unknown error.", connection.IP);
+                connection.LogError("Bot has crashed due to an unknown error.");
                 return;
             }
 
-            LogUtil.LogError("Bot has crashed due to an error:", connection.IP);
+            connection.LogError("Bot has crashed due to an error:");
             foreach (var ex in task.Exception.InnerExceptions)
             {
-                LogUtil.LogError(ex.Message, connection.IP);
+                connection.LogError(ex.Message);
                 var st = ex.StackTrace;
                 if (st != null)
-                    LogUtil.LogError(st, connection.IP);
+                    connection.LogError(st);
             }
         }
     }

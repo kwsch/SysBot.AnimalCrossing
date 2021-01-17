@@ -22,27 +22,27 @@ namespace CrossBot.SysBot
 
         public override void SoftStop() => Config.AcceptingCommands = false;
 
-        protected override async Task MainLoop(CancellationToken token)
+        public override async Task MainLoop(CancellationToken token)
         {
             // Disconnect our virtual controller; will reconnect once we send a button command after a request.
-            LogUtil.LogInfo("Detaching controller on startup as first interaction.", Config.IP);
+            Log("Detaching controller on startup as first interaction.");
             await Connection.SendAsync(SwitchCommand.DetachController(), token).ConfigureAwait(false);
             await Task.Delay(200, token).ConfigureAwait(false);
 
             // Validate inventory offset.
-            LogUtil.LogInfo("Checking inventory offset for validity.", Config.IP);
+            Log("Checking inventory offset for validity.");
             var valid = await GetIsPlayerInventoryValid(Config.Offset, token).ConfigureAwait(false);
             if (!valid)
             {
-                LogUtil.LogInfo($"Inventory read from {Config.Offset} (0x{Config.Offset:X8}) does not appear to be valid.", Config.IP);
+                Log($"Inventory read from {Config.Offset} (0x{Config.Offset:X8}) does not appear to be valid.");
                 if (Config.RequireValidInventoryMetadata)
                 {
-                    LogUtil.LogInfo("Exiting!", Config.IP);
+                    Log("Exiting!");
                     return;
                 }
             }
 
-            LogUtil.LogInfo("Successfully connected to bot. Starting main loop!", Config.IP);
+            Log("Successfully connected to bot. Starting main loop!");
             while (!token.IsCancellationRequested)
                 await DropLoop(token).ConfigureAwait(false);
         }
@@ -51,14 +51,14 @@ namespace CrossBot.SysBot
         {
             if (ValidateRequested)
             {
-                LogUtil.LogInfo("Checking inventory offset for validity.", Config.IP);
+                Log("Checking inventory offset for validity.");
                 var valid = await GetIsPlayerInventoryValid(Config.Offset, token).ConfigureAwait(false);
                 if (!valid)
                 {
-                    LogUtil.LogInfo($"Inventory read from {Config.Offset} (0x{Config.Offset:X8}) does not appear to be valid.", Config.IP);
+                    Connection.LogError($"Inventory read from {Config.Offset} (0x{Config.Offset:X8}) does not appear to be valid.");
                     if (Config.RequireValidInventoryMetadata)
                     {
-                        LogUtil.LogInfo("Turning off command processing!", Config.IP);
+                        Connection.LogError("Turning off command processing!");
                         Config.AcceptingCommands = false;
                     }
                 }
@@ -120,7 +120,7 @@ namespace CrossBot.SysBot
             }
 
             var itemName = GameInfo.Strings.GetItemName(item);
-            LogUtil.LogInfo($"Injecting Item: {item.DisplayItemId:X4} ({itemName}).", Config.IP);
+            Log($"Injecting Item: {item.DisplayItemId:X4} ({itemName}).");
 
             // Inject item.
             var data = item.ToBytesClass();
@@ -148,7 +148,7 @@ namespace CrossBot.SysBot
 
         private async Task CleanUp(int count, CancellationToken token)
         {
-            LogUtil.LogInfo("Picking up leftover items during idle time.", Config.IP);
+            Log("Picking up leftover items during idle time.");
 
             // Exit out of any menus.
             for (int i = 0; i < 3; i++)

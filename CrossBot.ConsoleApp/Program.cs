@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using CrossBot.Discord;
 using CrossBot.SysBot;
@@ -56,7 +57,7 @@ namespace CrossBot.ConsoleApp
             var token = cts.Token;
             var bot = new Bot(cfgBot);
             var sys = new SysCord(bot, cfgDiscord);
-            LogUtil.LogInfo("Starting Discord.", bot.Connection.IP);
+            bot.Log("Starting Discord.");
 #pragma warning disable 4014
             Task.Run(() => sys.MainAsync(cfgDiscord.Token, token), token);
 #pragma warning restore 4014
@@ -68,7 +69,12 @@ namespace CrossBot.ConsoleApp
 
         private static void SaveConfig<T>(T config, string path)
         {
-            var options = new JsonSerializerOptions {WriteIndented = true};
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+                IgnoreReadOnlyProperties = true,
+            };
             var json = JsonSerializer.Serialize(config, options);
             File.WriteAllText(path, json);
         }

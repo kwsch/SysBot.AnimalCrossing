@@ -7,7 +7,7 @@ namespace CrossBot.SysBot
     /// Serialized configuration for the <see cref="Bot"/>, containing overall permissions and setup parameters.
     /// </summary>
     [Serializable]
-    public sealed class BotConfig : SwitchBotConfig
+    public sealed record BotConfig : SwitchConnectionConfig
     {
         /// <summary> When enabled, the bot will accept commands from users. </summary>
         public bool AcceptingCommands { get; set; } = true;
