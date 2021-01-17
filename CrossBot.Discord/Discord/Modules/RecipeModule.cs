@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CrossBot.Core;
 using Discord;
 using Discord.Commands;
 using NHSE.Core;
@@ -46,7 +45,7 @@ namespace CrossBot.Discord
                 if (!string.Equals(item.Text, itemName, StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                if (!ItemRequestUtil.InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
+                if (!ItemParser.InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
                 {
                     await ReplyAsync("Requested item is not a DIY recipe.").ConfigureAwait(false);
                     return;
@@ -57,11 +56,11 @@ namespace CrossBot.Discord
                 return;
             }
 
-            var items = ItemUtil.GetItemsMatching(itemName, strings).ToArray();
+            var items = ItemParser.GetItemsMatching(itemName, strings).ToArray();
             var matches = new List<string>();
             foreach (var item in items)
             {
-                if (!ItemRequestUtil.InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
+                if (!ItemParser.InvertedRecipeDictionary.TryGetValue((ushort) item.Value, out var recipeID))
                     continue;
 
                 var msg = $"{item.Value:X4} {item.Text}: Recipe {recipeID:X3}";

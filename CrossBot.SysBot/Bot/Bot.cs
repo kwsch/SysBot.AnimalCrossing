@@ -26,7 +26,7 @@ namespace CrossBot.SysBot
         {
             // Disconnect our virtual controller; will reconnect once we send a button command after a request.
             Log("Detaching controller on startup as first interaction.");
-            await Connection.SendAsync(SwitchCommand.DetachController(), token).ConfigureAwait(false);
+            await Connection.SendAsync(SwitchCommand.DetachController(UseCRLF), token).ConfigureAwait(false);
             await Task.Delay(200, token).ConfigureAwait(false);
 
             // Validate inventory offset.
@@ -91,10 +91,10 @@ namespace CrossBot.SysBot
 
         private async Task<bool> GetIsPlayerInventoryValid(uint playerOfs, CancellationToken token)
         {
-            var (ofs, len) = InventoryValidator.GetOffsetLength(playerOfs);
+            PlayerItemSet.GetOffsetLength(playerOfs, out var ofs, out var len);
             var inventory = await Connection.ReadBytesAsync(ofs, len, token).ConfigureAwait(false);
 
-            return InventoryValidator.ValidateItemBinary(inventory);
+            return PlayerItemSet.ValidateItemBinary(inventory);
         }
 
         private async Task<int> DropItems(ItemRequest drop, CancellationToken token)
@@ -124,7 +124,7 @@ namespace CrossBot.SysBot
 
             // Inject item.
             var data = item.ToBytesClass();
-            var poke = SwitchCommand.Poke(Config.Offset, data);
+            var poke = SwitchCommand.Poke(Config.Offset, data, UseCRLF);
             await Connection.SendAsync(poke, token).ConfigureAwait(false);
             await Task.Delay(0_300, token).ConfigureAwait(false);
 
@@ -158,7 +158,7 @@ namespace CrossBot.SysBot
             for (int i = 0; i < count; i++)
             {
                 await Click(SwitchButton.Y, 2_000, token).ConfigureAwait(false);
-                var poke = SwitchCommand.Poke(Config.Offset, Item.NONE.ToBytes());
+                var poke = SwitchCommand.Poke(Config.Offset, Item.NONE.ToBytes(), UseCRLF);
                 await Connection.SendAsync(poke, token).ConfigureAwait(false);
                 await Task.Delay(1_000, token).ConfigureAwait(false);
             }

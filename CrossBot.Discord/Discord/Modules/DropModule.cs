@@ -61,7 +61,7 @@ namespace CrossBot.Discord
         public async Task RequestDropAsync([Summary(DropItemSummary)][Remainder]string request)
         {
             var cfg = Globals.Bot.Config;
-            var items = ItemRequestUtil.GetItemsFromUserInput(request, cfg.DropConfig);
+            var items = ItemParser.GetItemsFromUserInput(request, cfg.DropConfig);
             await DropItems(items).ConfigureAwait(false);
         }
 
@@ -76,7 +76,7 @@ namespace CrossBot.Discord
         [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
         public async Task RequestDropDIYAsync([Summary(DropDIYSummary)][Remainder]string recipeIDs)
         {
-            var items = ItemRequestUtil.GetDIYsFromUserInput(recipeIDs);
+            var items = ItemParser.GetDIYsFromUserInput(recipeIDs);
             await DropItems(items).ConfigureAwait(false);
         }
 
