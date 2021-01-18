@@ -16,6 +16,44 @@ namespace CrossBot.Discord
             "Hex Mode: Item IDs (in hex); request multiple by putting spaces between items. " +
             "Text Mode: Item names; request multiple by putting commas between items. To parse for another language, include the language code first and a comma, followed by the items.";
 
+        [Command("spawnNHI")] [Alias("sn")]
+        [Summary("Spawns a set of items.")]
+        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+        public async Task RequestSpawnAsync()
+        {
+            if (Context.Message.Attachments.Count == 0)
+            {
+                await ReplyAsync("No items requested; silly goose. Attach an `nhi` file next time, or request specific items.").ConfigureAwait(false);
+                return;
+            }
+
+            var att1 = Context.Message.Attachments.ElementAt(0);
+            var fn = att1.Filename;
+            if (!fn.EndsWith(".nhi"))
+            {
+                await ReplyAsync("I only accept `nhi` files.").ConfigureAwait(false);
+                return;
+            }
+
+            var size = att1.Size;
+            if (size % Item.SIZE != 0 || size == 0)
+            {
+                await ReplyAsync("That `nhi` does not appear to be a valid size.").ConfigureAwait(false);
+                return;
+            }
+
+            var max = Globals.Bot.FieldItemState.Config.MaxSpawnCount * 10;
+            if (size > Item.SIZE * max)
+            {
+                await ReplyAsync($"That `nhi` file is way too big. I only allow at most {max} items from an `nhi` file.").ConfigureAwait(false);
+                return;
+            }
+
+            var data = await NetUtil.DownloadFromUrlAsync(att1.Url).ConfigureAwait(false);
+            var items = Item.GetArray(data);
+            await SpawnItems(items).ConfigureAwait(false);
+        }
+
         [Command("spawnItems")] [Alias("si")]
         [Summary("Spawns a set of items.")]
         [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
