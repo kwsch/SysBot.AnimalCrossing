@@ -37,6 +37,42 @@ namespace CrossBot.Discord
             await ReplyAsync($"Accepting drop requests: {value}.").ConfigureAwait(false);
         }
 
+        [Command("toggleSpawns")]
+        [Summary("Toggles accepting spawn requests.")]
+        [RequireSudo]
+        public async Task ToggleSpawnsAsync()
+        {
+            bool value = (Globals.Bot.FieldItemState.Config.InjectFieldItemRequest ^= true);
+            await ReplyAsync($"Accepting spawn requests: {value}.").ConfigureAwait(false);
+        }
+
+        [Command("toggleLayer")]
+        [Summary("Toggles layer refresh cycle.")]
+        [RequireSudo]
+        public async Task ToggleLayerLoadAsync()
+        {
+            bool value = (Globals.Bot.FieldItemState.Config.InjectFieldItemLayer ^= true);
+            await ReplyAsync($"Refreshing field layer: {value}.").ConfigureAwait(false);
+        }
+
+        [Command("reloadLayer")]
+        [Summary("Re-initializes the layer file. Next bot loop will reload if enabled.")]
+        [RequireSudo]
+        public async Task ReloadLayerAsync()
+        {
+            var fi = Globals.Bot.FieldItemState;
+            bool value = fi.LoadFieldItemLayer(fi.Config.FieldItemLayerPath);
+            if (value)
+            {
+                fi.ForceReload();
+                await ReplyAsync("Reloaded from path. Sending to game soon.").ConfigureAwait(false);
+            }
+            else
+            {
+                await ReplyAsync("File not found.").ConfigureAwait(false);
+            }
+        }
+
         [Command("validate")]
         [Summary("Validates the bot inventory offset again.")]
         [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]

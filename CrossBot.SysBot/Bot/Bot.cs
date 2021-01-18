@@ -89,18 +89,31 @@ namespace CrossBot.SysBot
             }
             else if (FieldItemState.FullRefreshRequired)
             {
-                await Connection.WriteBytesAsync(FieldItemState.FieldItemLayer, FieldItemState.Config.FieldItemOffset, token).ConfigureAwait(false);
+                var ofs = FieldItemState.Config.FieldItemOffset;
+                if (!GetIsFieldItemOffsetValid(ofs))
+                    Log("Bad Field Item offset detected. Please configure it -- there is no validation!");
+                else
+                    await Connection.WriteBytesAsync(FieldItemState.FieldItemLayer, ofs, token).ConfigureAwait(false);
                 FieldItemState.AfterFullRefresh();
             }
             else if (FieldItemState.Injections.TryDequeue(out var itemSet))
             {
-                await InjectDroppedItems(itemSet, FieldItemState.Config.FieldItemOffset, token).ConfigureAwait(false);
+                var ofs = FieldItemState.Config.FieldItemOffset;
+                if (!GetIsFieldItemOffsetValid(ofs))
+                    Log("Bad Field Item offset detected. Please configure it -- there is no validation!");
+                else
+                    await InjectDroppedItems(itemSet, ofs, token).ConfigureAwait(false);
             }
             else
             {
                 DropState.StillIdle();
                 await Task.Delay(1_000, token).ConfigureAwait(false);
             }
+        }
+
+        private static bool GetIsFieldItemOffsetValid(in uint ofs)
+        {
+            return ofs > 100; // no validation besides checking if they configured something... lol
         }
 
         private async Task<bool> GetIsPlayerInventoryValid(uint playerOfs, CancellationToken token)

@@ -13,23 +13,25 @@ namespace CrossBot.SysBot
         private DateTime FieldItemInjectedTime = DateTime.MinValue;
         public byte[] FieldItemLayer = Array.Empty<byte>();
 
+        public void ForceReload() => FieldItemInjectedTime = DateTime.MinValue;
+
         public FieldItemState(FieldItemConfig cfg)
         {
             Config = cfg;
-            LoadFieldItemLayer(cfg);
+            LoadFieldItemLayer(cfg.FieldItemLayerPath);
             X = cfg.SpawnMinX;
             Y = cfg.SpawnMinY;
         }
 
-        private bool LoadFieldItemLayer(FieldItemConfig cfg)
+        public bool LoadFieldItemLayer(string path)
         {
-            if (!File.Exists(cfg.FieldItemLayerPath))
+            if (!File.Exists(path))
                 return false;
-            FieldItemLayer = File.ReadAllBytes(cfg.FieldItemLayerPath);
+            FieldItemLayer = File.ReadAllBytes(path);
             return true;
         }
 
-        public bool FullRefreshRequired => Config.InjectFieldItem && FieldItemInjectedTime - DateTime.Now > TimeSpan.FromMinutes(Config.FullRefreshCooldownMinutes);
+        public bool FullRefreshRequired => FieldItemLayer.Length != 0 && Config.InjectFieldItemRequest && FieldItemInjectedTime - DateTime.Now > TimeSpan.FromMinutes(Config.FullRefreshCooldownMinutes);
 
         public void AfterFullRefresh()
         {
