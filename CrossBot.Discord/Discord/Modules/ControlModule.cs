@@ -36,5 +36,25 @@ namespace CrossBot.Discord
             bool value = (Globals.Bot.Config.AcceptingCommands ^= true);
             await ReplyAsync($"Accepting drop requests: {value}.").ConfigureAwait(false);
         }
+
+        [Command("validate")]
+        [Summary("Validates the bot inventory offset again.")]
+        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+        public async Task RequestValidateAsync()
+        {
+            var bot = Globals.Bot;
+            if (bot.Config.DropConfig.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            {
+                await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
+                return;
+            }
+            if (!Globals.Bot.Config.AllowValidate)
+            {
+                await ReplyAsync("Validate functionality is currently disabled.").ConfigureAwait(false);
+                return;
+            }
+            Globals.Bot.ValidateRequested = true;
+            await ReplyAsync("A validate request will be executed momentarily. Check the logs for the result.").ConfigureAwait(false);
+        }
     }
 }

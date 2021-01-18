@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CrossBot.Core;
@@ -12,13 +12,18 @@ namespace CrossBot.SysBot
     /// </summary>
     public sealed class Bot : SwitchRoutineExecutor<BotConfig>
     {
-        public readonly ConcurrentQueue<ItemRequest> Injections = new();
         public bool CleanRequested { private get; set; }
         public bool ValidateRequested { private get; set; }
         public readonly IslandState Island = new();
 
-        public Bot(BotConfig cfg) : base(cfg) => State = new DropBotState(cfg.DropConfig);
-        public readonly DropBotState State;
+        public Bot(BotConfig cfg) : base(cfg)
+        {
+            DropState = new DropBotState(cfg.DropConfig);
+            FieldItemState = new FieldItemState(cfg.FieldItemConfig);
+        }
+
+        public readonly DropBotState DropState;
+        public readonly FieldItemState FieldItemState;
 
         public override void SoftStop() => Config.AcceptingCommands = false;
 
@@ -71,20 +76,29 @@ namespace CrossBot.SysBot
                 return;
             }
 
-            if (Injections.TryDequeue(out var item))
+            if (DropState.Injections.TryDequeue(out var item))
             {
                 var count = await DropItems(item, token).ConfigureAwait(false);
-                State.AfterDrop(count);
+                DropState.AfterDrop(count);
             }
-            else if ((State.CleanRequired && State.Config.AutoClean) || CleanRequested)
+            else if ((DropState.CleanRequired && DropState.Config.AutoClean) || CleanRequested)
             {
-                await CleanUp(State.Config.PickupCount, token).ConfigureAwait(false);
-                State.AfterClean();
+                await CleanUp(DropState.Config.PickupCount, token).ConfigureAwait(false);
+                DropState.AfterClean();
                 CleanRequested = false;
+            }
+            else if (FieldItemState.FullRefreshRequired)
+            {
+                await Connection.WriteBytesAsync(FieldItemState.FieldItemLayer, FieldItemState.Config.FieldItemOffset, token).ConfigureAwait(false);
+                FieldItemState.AfterFullRefresh();
+            }
+            else if (FieldItemState.Injections.TryDequeue(out var itemSet))
+            {
+                await InjectDroppedItems(itemSet, FieldItemState.Config.FieldItemOffset, token).ConfigureAwait(false);
             }
             else
             {
-                State.StillIdle();
+                DropState.StillIdle();
                 await Task.Delay(1_000, token).ConfigureAwait(false);
             }
         }
@@ -161,6 +175,15 @@ namespace CrossBot.SysBot
                 var poke = SwitchCommand.Poke(Config.Offset, Item.NONE.ToBytes(), UseCRLF);
                 await Connection.SendAsync(poke, token).ConfigureAwait(false);
                 await Task.Delay(1_000, token).ConfigureAwait(false);
+            }
+        }
+
+        private async Task InjectDroppedItems(IReadOnlyList<FieldItemColumn> itemSet, uint fiOffset, CancellationToken token)
+        {
+            foreach (var column in itemSet)
+            {
+                await Connection.WriteBytesAsync(column.Data, fiOffset + (uint)column.Offset, token).ConfigureAwait(false);
+                Log($"Wrote {column.Data.Length / Item.SIZE} tiles to field item map @ ({column.X},{column.Y}).");
             }
         }
     }
