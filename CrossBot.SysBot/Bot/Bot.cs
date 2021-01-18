@@ -29,6 +29,14 @@ namespace CrossBot.SysBot
 
         public override async Task MainLoop(CancellationToken token)
         {
+            // Validate our config.
+            var coord = Config.FieldItemConfig.ValidateCoordinates();
+            if (coord != CoordinateResult.Valid)
+            {
+                Log($"Coordinates are not valid! {coord}. Exiting!");
+                return;
+            }
+
             // Disconnect our virtual controller; will reconnect once we send a button command after a request.
             Log("Detaching controller on startup as first interaction.");
             await Connection.SendAsync(SwitchCommand.DetachController(UseCRLF), token).ConfigureAwait(false);
