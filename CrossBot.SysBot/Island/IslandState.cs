@@ -10,7 +10,7 @@ namespace CrossBot.SysBot
         public string DodoCode { get; set; } = "No code set yet.";
 
         public int Count { get { lock (_sync) return List.Count; } }
-        public IslandVisitor[] CurrentVisitors { get { lock (_sync) return List.ToArray(); } }
+        public IslandVisitor[] GetCurrentVisitors() { { lock (_sync) return List.ToArray(); } }
 
         public IslandVisitor? GetVisitor(ulong userID) { lock (_sync) return List.Find(z => z.UserID == userID); }
         public IslandVisitor? GetVisitor(string name) { lock (_sync) return List.Find(z => z.Name == name); }

@@ -31,7 +31,7 @@ namespace CrossBot.Discord
         [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
         public async Task RequestVisitorListAsync()
         {
-            var visitors = Globals.Bot.Island.CurrentVisitors.Select(z => z.ToString());
+            var visitors = Globals.Bot.Island.GetCurrentVisitors().Select(z => z.ToString());
             await ReplyAsync($"Visitor list:\r\n{string.Join("\r\n", visitors)}").ConfigureAwait(false);
         }
 
@@ -58,7 +58,7 @@ namespace CrossBot.Discord
                 await ReplyAsync($"Too many people are already on the island (max {cfg.MaxVisitorCount}. Please wait until someone leaves.").ConfigureAwait(false);
                 return;
             }
-            
+
             var result = island.Arrive(user.Username, user.Id);
             if (!result)
             {
@@ -98,7 +98,6 @@ namespace CrossBot.Discord
 
             await ReplyAsync($"{user.Username} has left the island the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
         }
-
 
         [Command("leave")] [Alias("l")]
         [Summary("Indicates the user is leaving the island.")]

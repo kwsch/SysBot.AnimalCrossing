@@ -22,7 +22,7 @@ namespace CrossBot.Discord
         public List<ulong> Channels { get; set; } = new();
         public List<ulong> Users { get; set; } = new();
         public List<ulong> Sudo { get; set; } = new();
-        
+
         /// <summary>
         /// Modules that are blacklisted. Comma separated, by class name.
         /// </summary>

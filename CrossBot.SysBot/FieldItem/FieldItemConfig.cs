@@ -3,6 +3,7 @@ using static NHSE.Core.FieldItemLayer;
 
 namespace CrossBot.SysBot
 {
+    [Serializable]
     public class FieldItemConfig
     {
         /// <summary> Offset the Field Item Layer 1 starts at. Shouldn't be zero. </summary>

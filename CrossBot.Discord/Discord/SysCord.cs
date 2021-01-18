@@ -145,7 +145,7 @@ namespace CrossBot.Discord
                 if (blacklist.Any(z => z.Equals(name, StringComparison.OrdinalIgnoreCase)))
                     await _commands.RemoveModuleAsync(module).ConfigureAwait(false);
             }
-            
+
             // Subscribe a handler to see if a message invokes a command.
             _client.MessageReceived += HandleMessageAsync;
         }
