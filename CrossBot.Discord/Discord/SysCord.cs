@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -105,10 +106,10 @@ namespace CrossBot.Discord
             return Task.CompletedTask;
         }
 
-        public async Task MainAsync(string apiToken, CancellationToken token)
+        public async Task MainAsync(string apiToken, DiscordBotConfig cfg, CancellationToken token)
         {
             // Centralize the logic for commands into a separate method.
-            await InitCommands().ConfigureAwait(false);
+            await InitCommands(cfg).ConfigureAwait(false);
 
             // Login and connect.
             await _client.LoginAsync(TokenType.Bot, apiToken).ConfigureAwait(false);
@@ -127,11 +128,24 @@ namespace CrossBot.Discord
             await MonitorStatusAsync(token).ConfigureAwait(false);
         }
 
-        public async Task InitCommands()
+        public async Task InitCommands(DiscordBotConfig cfg)
         {
             var assembly = Assembly.GetExecutingAssembly();
 
             await _commands.AddModulesAsync(assembly, _services).ConfigureAwait(false);
+            var modules = _commands.Modules.ToList();
+
+            var blacklist = cfg.ModuleBlacklist
+                .Replace("Module", "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(z => z.Trim()).ToList();
+
+            foreach (var module in modules)
+            {
+                var name = module.Name.Replace("Module", "");
+                if (blacklist.Any(z => z.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    await _commands.RemoveModuleAsync(module).ConfigureAwait(false);
+            }
+            
             // Subscribe a handler to see if a message invokes a command.
             _client.MessageReceived += HandleMessageAsync;
         }

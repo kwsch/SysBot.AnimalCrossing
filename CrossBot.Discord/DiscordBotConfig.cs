@@ -22,6 +22,11 @@ namespace CrossBot.Discord
         public List<ulong> Channels { get; set; } = new();
         public List<ulong> Users { get; set; } = new();
         public List<ulong> Sudo { get; set; } = new();
+        
+        /// <summary>
+        /// Modules that are blacklisted. Comma separated, by class name.
+        /// </summary>
+        public string ModuleBlacklist { get; set; } = string.Empty;
 
         public bool CanUseCommandUser(ulong authorId) => Users.Count == 0 || Users.Contains(authorId);
         public bool CanUseCommandChannel(ulong channelId) => Channels.Count == 0 || Channels.Contains(channelId);

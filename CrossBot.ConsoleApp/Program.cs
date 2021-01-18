@@ -59,7 +59,7 @@ namespace CrossBot.ConsoleApp
             var sys = new SysCord(bot, cfgDiscord);
             bot.Log("Starting Discord.");
 #pragma warning disable 4014
-            Task.Run(() => sys.MainAsync(cfgDiscord.Token, token), token);
+            Task.Run(() => sys.MainAsync(cfgDiscord.Token, cfgDiscord, token), token);
 #pragma warning restore 4014
 
             await BotRunner.RunFrom(bot, token).ConfigureAwait(false);
