@@ -53,7 +53,7 @@ namespace CrossBot.Discord
 
             var cfg = Globals.Bot.Config;
             var island = Globals.Bot.Island;
-            if (cfg.RequireJoin && island.Count > cfg.MaxVisitorCount && !Globals.Self.Config.CanUseSudo(user.Id))
+            if (cfg.RequireJoin && island.Count >= cfg.MaxVisitorCount && !Globals.Self.Config.CanUseSudo(user.Id))
             {
                 await ReplyAsync($"Too many people are already on the island (max {cfg.MaxVisitorCount}. Please wait until someone leaves.").ConfigureAwait(false);
                 return;
