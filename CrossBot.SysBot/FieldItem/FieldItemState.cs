@@ -21,6 +21,11 @@ namespace CrossBot.SysBot
             LoadFieldItemLayer(cfg.FieldItemLayerPath);
             X = cfg.SpawnMinX;
             Y = cfg.SpawnMinY;
+
+            if ((X & 1) == 1)
+                X++;
+            if ((Y & 1) == 1)
+                Y++;
         }
 
         public bool LoadFieldItemLayer(string path)
@@ -46,11 +51,11 @@ namespace CrossBot.SysBot
             var result = (X & ~1, Y & ~1);
             var width = count / height;
             X += Math.Max(Config.SpawnSpacingX, (width * 2) + 2);
-            if (X > Config.SpawnMaxX)
+            if (X > NHSE.Core.FieldItemLayer.FieldItemWidth - Config.SpawnMaxX)
             {
                 X = Config.SpawnMinX;
                 Y += Config.SpawnSpacingY;
-                if (Y > Config.SpawnMaxY)
+                if (Y > NHSE.Core.FieldItemLayer.FieldItemHeight - Config.SpawnMaxY)
                     Y = Config.SpawnMinY;
             }
             return result;
