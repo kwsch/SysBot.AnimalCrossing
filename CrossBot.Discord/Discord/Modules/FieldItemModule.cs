@@ -82,11 +82,12 @@ namespace CrossBot.Discord
 
             var bot = Globals.Bot;
             var fi = bot.FieldItemState;
-            var height = fi.Config.GetSpawnHeight(items.Count);
+            var cfg = fi.Config;
+            var height = cfg.GetSpawnHeight(items.Count);
             (int x, int y) = fi.GetNextInjectCoordinates(items.Count, height);
             string atCoords = $"at coordinates ({x},{y}) (count:{items.Count}, height:{Math.Min(items.Count, height)})";
 
-            bool canInject = FieldItemDropper.CanFitDropped(x, y, items.Count, height);
+            bool canInject = FieldItemDropper.CanFitDropped(x, y, items.Count, height, cfg.SpawnMinX, cfg.SpawnMaxX, cfg.SpawnMinY, cfg.SpawnMaxY);
             if (!canInject)
             {
                 await ReplyAsync($"Unable to inject {atCoords}. Please confirm the bot is configured correctly, and contact the owner.").ConfigureAwait(false);
