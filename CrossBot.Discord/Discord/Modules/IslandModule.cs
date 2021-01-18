@@ -50,7 +50,15 @@ namespace CrossBot.Discord
                 }
                 user = Context.Message.MentionedUsers.ElementAt(0);
             }
+
+            var cfg = Globals.Bot.Config;
             var island = Globals.Bot.Island;
+            if (cfg.RequireJoin && island.Count > cfg.MaxVisitorCount && !Globals.Self.Config.CanUseSudo(user.Id))
+            {
+                await ReplyAsync($"Too many people are already on the island (max {cfg.MaxVisitorCount}. Please wait until someone leaves.").ConfigureAwait(false);
+                return;
+            }
+            
             var result = island.Arrive(user.Username, user.Id);
             if (!result)
             {
@@ -89,6 +97,23 @@ namespace CrossBot.Discord
             }
 
             await ReplyAsync($"{user.Username} has left the island the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
+        }
+
+
+        [Command("leave")] [Alias("l")]
+        [Summary("Indicates the user is leaving the island.")]
+        [RequireSudo]
+        public async Task LeaveIslandAsync(ulong uid)
+        {
+            var island = Globals.Bot.Island;
+            var result = island.Depart(uid);
+            if (result == null)
+            {
+                await ReplyAsync("Not present on island.").ConfigureAwait(false);
+                return;
+            }
+
+            await ReplyAsync($"{result.Name} has left the island the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
         }
 
         [Command("time")] [Alias("vt", "visitTime", "timeVisit", "duration")]

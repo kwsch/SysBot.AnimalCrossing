@@ -18,12 +18,15 @@ namespace CrossBot.SysBot
         /// <summary> Offset the items are injected at. This should be the player inventory slot you have currently selected in-game. </summary>
         public uint Offset { get; set; } = 0xABC25840;
 
-        /// <summary> Offset the Field Item Layer 1 is located at.</summary>
-        public uint FieldItemOffset { get; set; } = 0;
-
         /// <summary> When enabled, the Bot will not allow RAM edits if the player's item metadata is invalid. </summary>
         /// <remarks> Only disable this as a last resort, and you have corrupted your item metadata through other means. </remarks>
         public bool RequireValidInventoryMetadata { get; set; } = true;
+
+        /// <summary> Require the players to <see cref="IslandState.Arrive(string)"/> prior to being able to accept commands. </summary>
+        public bool RequireJoin { get; set; } = true;
+
+        /// <summary> Maximum amount of people that can visit the bot at a time. </summary>
+        public int MaxVisitorCount { get; set; } = 7;
 
         public DropBotConfig DropConfig { get; set; } = new();
 

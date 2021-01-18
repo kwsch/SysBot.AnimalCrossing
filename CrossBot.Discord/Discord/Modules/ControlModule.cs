@@ -79,7 +79,7 @@ namespace CrossBot.Discord
         public async Task RequestValidateAsync()
         {
             var bot = Globals.Bot;
-            if (bot.Config.DropConfig.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
             {
                 await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
                 return;

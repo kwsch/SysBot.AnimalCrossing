@@ -18,7 +18,7 @@ namespace CrossBot.Discord
         public async Task RequestCleanAsync()
         {
             var bot = Globals.Bot;
-            if (bot.Config.DropConfig.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
             {
                 await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
                 return;
@@ -44,7 +44,7 @@ namespace CrossBot.Discord
         public async Task RequestDropAsync([Summary(DropItemSummary)][Remainder]string request)
         {
             var bot = Globals.Bot;
-            if (bot.Config.DropConfig.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
             {
                 await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
                 return;
@@ -66,7 +66,7 @@ namespace CrossBot.Discord
         public async Task RequestDropDIYAsync([Summary(DropDIYSummary)][Remainder]string recipeIDs)
         {
             var bot = Globals.Bot;
-            if (bot.Config.DropConfig.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
             {
                 await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
                 return;

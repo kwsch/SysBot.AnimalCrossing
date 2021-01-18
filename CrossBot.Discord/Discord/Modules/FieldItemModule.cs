@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
@@ -60,7 +61,7 @@ namespace CrossBot.Discord
         public async Task RequestSpawnAsync([Summary(SpawnItemSummary)][Remainder] string request)
         {
             var bot = Globals.Bot;
-            if (bot.FieldItemState.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
             {
                 await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
                 return;
@@ -83,7 +84,7 @@ namespace CrossBot.Discord
             var fi = bot.FieldItemState;
             var height = fi.Config.GetSpawnHeight(items.Count);
             (int x, int y) = fi.GetNextInjectCoordinates(items.Count, height);
-            string atCoords = $"at coordinates ({x},{y}) (count:{items.Count}, height{height})";
+            string atCoords = $"at coordinates ({x},{y}) (count:{items.Count}, height:{Math.Min(items.Count, height)})";
 
             bool canInject = FieldItemDropper.CanFitDropped(x, y, items.Count, height);
             if (!canInject)
