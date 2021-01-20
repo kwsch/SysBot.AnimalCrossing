@@ -92,5 +92,25 @@ namespace CrossBot.Discord
             Globals.Bot.ValidateRequested = true;
             await ReplyAsync("A validate request will be executed momentarily. Check the logs for the result.").ConfigureAwait(false);
         }
+
+        [Command("getCoordinates")]
+        [Summary("Gets the current coordinates of the bot.")]
+        [RequireSudo]
+        public async Task GetCoordinatesAsync()
+        {
+            var vs = Globals.Bot.ViewState;
+            var (x, y) = await vs.GetCoordinates(CancellationToken.None).ConfigureAwait(false);
+            await ReplyAsync($"X:{x} Y:{y}.").ConfigureAwait(false);
+        }
+
+        [Command("setCoordinates")]
+        [Summary("Sets the current coordinates of the bot.")]
+        [RequireSudo]
+        public async Task SetCoordinatesAsync(ushort x, ushort y)
+        {
+            await ReplyAsync($"Warping to X:{x} Y:{y}.").ConfigureAwait(false);
+            var vs = Globals.Bot.ViewState;
+            await vs.SetCoordinates(x, y, CancellationToken.None).ConfigureAwait(false);
+        }
     }
 }

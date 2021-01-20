@@ -7,8 +7,7 @@ namespace CrossBot.SysBot
 {
     public class AdvancedViewState : PlayerViewState
     {
-        private byte[] InitialPlayerX = Array.Empty<byte>();
-        private byte[] InitialPlayerY = Array.Empty<byte>();
+        private byte[] InitialPlayerCoordinates = Array.Empty<byte>();
 
         public AdvancedViewState(SwitchRoutineExecutor<BotConfig> con) : base(con) => Config = con.Config.ViewConfig;
         public readonly ViewStateConfig Config;
@@ -19,8 +18,7 @@ namespace CrossBot.SysBot
             CoordinateAddressIsland = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
 
             Executor.Log("Saving starting position.");
-            InitialPlayerX = await Connection.ReadBytesAbsoluteAsync(CoordinateAddressIsland + 0x00, 8, token).ConfigureAwait(false);
-            InitialPlayerY = await Connection.ReadBytesAbsoluteAsync(CoordinateAddressIsland + 0x08, 8, token).ConfigureAwait(false);
+            InitialPlayerCoordinates = await Connection.ReadBytesAbsoluteAsync(CoordinateAddressIsland, PlayerCoordinateSize, token).ConfigureAwait(false);
         }
 
         #region Open Gates, Get Dodo Code
@@ -38,15 +36,15 @@ namespace CrossBot.SysBot
         public async Task ResetToStartPosition(CancellationToken token)
         {
             // Sets player xy coordinates to their initial values when bot was started and set player rotation to 0.
-            await SetPosition(InitialPlayerX, InitialPlayerY, CoordinateAddressIsland, token).ConfigureAwait(false);
+            await SetPosition(InitialPlayerCoordinates, CoordinateAddressIsland, token).ConfigureAwait(false);
             await SetRotation(new byte[4], CoordinateAddressIsland + 0x3A, token).ConfigureAwait(false);
         }
 
         public async Task WarpToAirportFromIsland(CancellationToken token)
         {
             // Teleport player to airport entrance and set rotation to face doorway.
-            var x = new byte[] { 64, 68, 0, 0, 0, 0, 0, 0 };
-            var y = new byte[] { 132, 68, 0, 0, 0, 0, 0, 0 };
+            var x = Config.AirportX;
+            var y = Config.AirportY;
             await SetPosition(x, y, CoordinateAddressIsland, token).ConfigureAwait(false);
 
             var r = new byte[] { 0, 0, 0, 112 };
@@ -71,9 +69,8 @@ namespace CrossBot.SysBot
             var exp = Executor.Config.ViewConfig.CoordinatePointer;
             CoordinateAddressAirport = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
 
-            var x = new byte[] {58, 67, 0, 0, 0, 0, 0, 0};
-            var y = new byte[] {38, 67, 0, 0, 0, 0, 0, 0};
-            await SetPosition(x, y, CoordinateAddressAirport, token).ConfigureAwait(false);
+            var coords = new byte[] {58, 67, 0, 0, 0, 0, 0, 0, 38, 67};
+            await SetPosition(coords, CoordinateAddressAirport, token).ConfigureAwait(false);
         }
 
         public async Task OpenGates(CancellationToken token)
@@ -116,5 +113,23 @@ namespace CrossBot.SysBot
                 await Task.Delay(Executor.Config.ViewConfig.OverworldLoopCheckDelay, token).ConfigureAwait(false);
         }
         #endregion
+
+        public async Task<(ushort X, ushort Y)> GetCoordinates(CancellationToken token)
+        {
+            var exp = Executor.Config.ViewConfig.CoordinatePointer;
+            CoordinateAddressIsland = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
+
+            var result = await Connection.ReadBytesAbsoluteAsync(CoordinateAddressIsland, PlayerCoordinateSize, token).ConfigureAwait(false);
+            var x = BitConverter.ToUInt16(result, 0);
+            var y = BitConverter.ToUInt16(result, 8);
+            return (x, y);
+        }
+
+        public async Task SetCoordinates(ushort x, ushort y, CancellationToken token)
+        {
+            var exp = Executor.Config.ViewConfig.CoordinatePointer;
+            var ofs = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
+            await SetPosition(x, y, ofs, token).ConfigureAwait(false);
+        }
     }
 }
