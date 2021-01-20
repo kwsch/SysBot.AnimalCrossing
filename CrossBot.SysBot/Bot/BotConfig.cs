@@ -32,6 +32,8 @@ namespace CrossBot.SysBot
 
         public FieldItemConfig FieldItemConfig { get; set; } = new();
 
+        public ViewStateConfig ViewConfig { get; set; } = new();
+
         /// <summary> When enabled, users in Discord can request the bot to pick up items (spamming Y a <see cref="DropBotConfig.PickupCount"/> times). </summary>
         public bool AllowClean { get; set; }
 
