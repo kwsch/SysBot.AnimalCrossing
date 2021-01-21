@@ -36,7 +36,7 @@ namespace CrossBot.SysBot
             return true;
         }
 
-        public bool FullRefreshRequired => FieldItemLayer.Length != 0 && Config.InjectFieldItemRequest && FieldItemInjectedTime - DateTime.Now > TimeSpan.FromMinutes(Config.FullRefreshCooldownMinutes);
+        public bool FullRefreshRequired => FieldItemLayer.Length != 0 && Config.InjectFieldItemRequest && DateTime.Now - FieldItemInjectedTime > TimeSpan.FromMinutes(Config.FullRefreshCooldownMinutes);
 
         public void AfterFullRefresh()
         {
