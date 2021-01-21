@@ -48,29 +48,38 @@ namespace CrossBot.SysBot
 
         public (int x, int y) GetNextInjectCoordinates(int count, int height)
         {
-            var (x, y) = (X & ~1, Y & ~1);
             var width = count / height;
+
+            var (x, y) = (X, Y);
             AdvanceCoordinates(width);
-            var cfg = Config;
 
             // Might have overlapped the boundary. Check before returning.
+            var cfg = Config;
             bool canInject = FieldItemDropper.CanFitDropped(x, y, count, height, cfg.SpawnMinX, cfg.SpawnMaxX, cfg.SpawnMinY, cfg.SpawnMaxY);
-            if (!canInject)
-            {
-                (x, y) = (X & ~1, Y & ~1);
-                AdvanceCoordinates(width);
-            }
-            return (x, y);
+            if (canInject)
+                return (x, y);
+
+            (x, y) = (X, Y);
+            AdvanceCoordinates(width);
+
+            // Might be overlapping still on the Y boundary. If so, reset to initial.
+            canInject = FieldItemDropper.CanFitDropped(x, y, count, height, cfg.SpawnMinX, cfg.SpawnMaxX, cfg.SpawnMinY, cfg.SpawnMaxY);
+            if (canInject)
+                return (x, y);
+
+            X = Config.SpawnMinX;
+            Y = Config.SpawnMinY;
+            return (X, Y);
         }
 
         private void AdvanceCoordinates(int width)
         {
-            X += Math.Max(Config.SpawnSpacingX, (width * 2) + 2);
+            X += Math.Max(Config.SpawnSpacingX, width + 1) * 2;
             if (X <= NHSE.Core.FieldItemLayer.FieldItemWidth - Config.SpawnMaxX)
                 return;
 
             X = Config.SpawnMinX;
-            Y += Config.SpawnSpacingY;
+            Y += Config.SpawnSpacingY * 2;
             if (Y <= NHSE.Core.FieldItemLayer.FieldItemHeight - Config.SpawnMaxY)
                 return;
 
