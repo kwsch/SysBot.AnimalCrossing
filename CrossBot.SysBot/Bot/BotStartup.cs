@@ -24,9 +24,10 @@ namespace CrossBot.SysBot
 
             var sessionActive = await b.ViewState.IsLinkSessionActive(token).ConfigureAwait(false);
             if (sessionActive)
-                return true;
+                return await b.ViewState.StartupGetDodoCode(b, token, true).ConfigureAwait(false);
 
-            return await b.ViewState.StartupOpenGates(b, token).ConfigureAwait(false);
+            bool gates = await b.ViewState.StartupOpenGates(b, token).ConfigureAwait(false);
+            return gates && await b.ViewState.StartupGetDodoCode(b, token).ConfigureAwait(false);
         }
 
         private static bool ValidateConfigFileParameters(Bot b)
@@ -51,12 +52,6 @@ namespace CrossBot.SysBot
 
         public static async Task<bool> StartupOpenGates(this AdvancedViewState s, Bot b, CancellationToken token)
         {
-            if (!s.Config.DodoCodeRetrieval)
-            {
-                b.Log($"{nameof(ViewStateConfig.DodoCodeRetrieval)} has to be enabled to automatically retrieve Dodo code.");
-                return false;
-            }
-
             if (!s.Config.AllowTeleportation)
             {
                 b.Log($"{nameof(ViewStateConfig.AllowTeleportation)} has to be enabled to automatically retrieve Dodo code.");
@@ -73,15 +68,25 @@ namespace CrossBot.SysBot
             await s.WarpToIslandFromAirport(token).ConfigureAwait(false);
             await s.WaitEnterIsland(token).ConfigureAwait(false);
 
+            // Reset player position to initial position.
+            await s.ResetToStartPosition(token).ConfigureAwait(false);
+
+            return true;
+        }
+
+        public static async Task<bool> StartupGetDodoCode(this AdvancedViewState s, Bot b, CancellationToken token, bool allowNoFetch = false)
+        {
+            if (!s.Config.DodoCodeRetrieval)
+            {
+                b.Log($"{nameof(ViewStateConfig.DodoCodeRetrieval)} has to be enabled to automatically retrieve Dodo code. Please set the Dodo code via command.");
+                return allowNoFetch;
+            }
+
             var code = await s.GetDodoCode(token).ConfigureAwait(false);
             if (code == null)
                 return false;
 
             b.Island.DodoCode = code;
-
-            // Reset player position to initial position.
-            await s.ResetToStartPosition(token).ConfigureAwait(false);
-
             return true;
         }
     }

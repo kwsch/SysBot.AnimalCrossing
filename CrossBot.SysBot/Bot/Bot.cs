@@ -60,6 +60,12 @@ namespace CrossBot.SysBot
                     Log("Opening gates has failed. Stopping bot loop.");
                     return false;
                 }
+
+                if (!await ViewState.StartupGetDodoCode(this, token).ConfigureAwait(false))
+                {
+                    Log("Unable to retrieve new dodo code. Stopping bot loop.");
+                    return false;
+                }
             }
 
             if (ValidateRequested)

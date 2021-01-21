@@ -25,18 +25,28 @@ namespace CrossBot.SysBot
         public async Task<string?> GetDodoCode(CancellationToken token)
         {
             // Obtain Dodo code from offset and store it.
-            byte[] bytes = await Connection.ReadBytesAsync(DodoCodeOffset, 0x5, token).ConfigureAwait(false);
+            const uint offset = DodoCodeOffset;
+            byte[] bytes = await Connection.ReadBytesAsync(offset, 0x5, token).ConfigureAwait(false);
             var result = System.Text.Encoding.UTF8.GetString(bytes, 0, 5);
-            if (string.IsNullOrWhiteSpace(result))
-                Connection.LogError($"Failed to retrieve dodo code from 0x{DodoCodeOffset:X8}.");
             Connection.Log($"Retrieved Dodo code: {result}.");
-            return result;
+
+            bool valid = !string.IsNullOrWhiteSpace(result);
+            if (valid)
+                return result;
+
+            Connection.LogError($"Failed to retrieve dodo code from 0x{offset:X8}.");
+            return null;
         }
 
         public async Task ResetToStartPosition(CancellationToken token)
         {
             // Sets player xy coordinates to their initial values when bot was started and set player rotation to 0.
-            await SetPosition(InitialPlayerCoordinates, CoordinateAddressIsland, token).ConfigureAwait(false);
+            var ofs = CoordinateAddressIsland;
+            if (Config.DropX != 0)
+                await SetPosition(Config.DropX, Config.DropY, ofs, token).ConfigureAwait(false);
+            else
+                await SetPosition(InitialPlayerCoordinates, CoordinateAddressIsland, token).ConfigureAwait(false);
+
             await SetRotation(new byte[4], CoordinateAddressIsland + 0x3A, token).ConfigureAwait(false);
         }
 
