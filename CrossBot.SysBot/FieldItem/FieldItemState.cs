@@ -46,19 +46,35 @@ namespace CrossBot.SysBot
         private int X;
         private int Y;
 
-        public (int, int) GetNextInjectCoordinates(int count, int height)
+        public (int x, int y) GetNextInjectCoordinates(int count, int height)
         {
-            var result = (X & ~1, Y & ~1);
+            var (x, y) = (X & ~1, Y & ~1);
             var width = count / height;
-            X += Math.Max(Config.SpawnSpacingX, (width * 2) + 2);
-            if (X > NHSE.Core.FieldItemLayer.FieldItemWidth - Config.SpawnMaxX)
+            AdvanceCoordinates(width);
+            var cfg = Config;
+
+            // Might have overlapped the boundary. Check before returning.
+            bool canInject = FieldItemDropper.CanFitDropped(x, y, count, height, cfg.SpawnMinX, cfg.SpawnMaxX, cfg.SpawnMinY, cfg.SpawnMaxY);
+            if (!canInject)
             {
-                X = Config.SpawnMinX;
-                Y += Config.SpawnSpacingY;
-                if (Y > NHSE.Core.FieldItemLayer.FieldItemHeight - Config.SpawnMaxY)
-                    Y = Config.SpawnMinY;
+                (x, y) = (X & ~1, Y & ~1);
+                AdvanceCoordinates(width);
             }
-            return result;
+            return (x, y);
+        }
+
+        private void AdvanceCoordinates(int width)
+        {
+            X += Math.Max(Config.SpawnSpacingX, (width * 2) + 2);
+            if (X <= NHSE.Core.FieldItemLayer.FieldItemWidth - Config.SpawnMaxX)
+                return;
+
+            X = Config.SpawnMinX;
+            Y += Config.SpawnSpacingY;
+            if (Y <= NHSE.Core.FieldItemLayer.FieldItemHeight - Config.SpawnMaxY)
+                return;
+
+            Y = Config.SpawnMinY;
         }
     }
 }
