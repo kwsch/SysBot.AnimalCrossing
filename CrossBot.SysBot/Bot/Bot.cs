@@ -99,9 +99,14 @@ namespace CrossBot.SysBot
             {
                 var ofs = FieldItemState.Config.FieldItemOffset;
                 if (!GetIsFieldItemOffsetValid(ofs))
+                {
                     Log("Bad Field Item offset detected. Please configure it -- there is no validation!");
+                }
                 else
+                {
+                    Log($"Writing Field Item Layer to 0x{ofs:X8}");
                     await Connection.WriteBytesAsync(FieldItemState.FieldItemLayer, ofs, token).ConfigureAwait(false);
+                }
                 FieldItemState.AfterFullRefresh();
             }
             else if (FieldItemState.Injections.TryDequeue(out var itemSet))
