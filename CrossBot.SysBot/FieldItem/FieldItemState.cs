@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using NHSE.Core;
+using SysBot.Base;
 
 namespace CrossBot.SysBot
 {
@@ -31,8 +32,12 @@ namespace CrossBot.SysBot
         public bool LoadFieldItemLayer(string path)
         {
             if (!File.Exists(path))
+            {
+                LogUtil.LogError($"Unable to load: Requested path does not exist: {path}.", nameof(FieldItemLayer));
                 return false;
+            }
             FieldItemLayer = File.ReadAllBytes(path);
+            LogUtil.LogInfo($"Loaded field item layer (0x{FieldItemLayer.Length:X} bytes) from: {path}.", nameof(FieldItemLayer));
             return true;
         }
 

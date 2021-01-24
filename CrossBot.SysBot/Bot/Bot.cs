@@ -104,8 +104,9 @@ namespace CrossBot.SysBot
                 }
                 else
                 {
-                    Log($"Writing Field Item Layer to 0x{ofs:X8}");
-                    await Connection.WriteBytesAsync(FieldItemState.FieldItemLayer, ofs, token).ConfigureAwait(false);
+                    var payload = FieldItemState.FieldItemLayer;
+                    Log($"Writing Field Item Layer to 0x{ofs:X8}, size 0x{payload.Length:X} bytes.");
+                    await Connection.WriteBytesAsync(payload, ofs, token).ConfigureAwait(false);
                 }
                 FieldItemState.AfterFullRefresh();
             }
