@@ -96,7 +96,7 @@ namespace CrossBot.Discord
                 return;
             }
 
-            await ReplyAsync($"{user.Username} has left the island the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
+            await ReplyAsync($"{user.Username} has left the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
         }
 
         [Command("leave")] [Alias("l")]
@@ -112,7 +112,7 @@ namespace CrossBot.Discord
                 return;
             }
 
-            await ReplyAsync($"{result.Name} has left the island the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
+            await ReplyAsync($"{result.Name} has left the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
         }
 
         [Command("time")] [Alias("vt", "visitTime", "timeVisit", "duration")]
