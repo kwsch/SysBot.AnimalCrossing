@@ -219,36 +219,29 @@ namespace CrossBot.Discord
 
         private async Task MonitorStatusAsync(CancellationToken token)
         {
-            const int Interval = 20; // seconds
-            // Check datetime for update
-            UserStatus state = UserStatus.Idle;
+            var state = UserStatus.Idle;
             while (!token.IsCancellationRequested)
             {
-                var time = DateTime.Now;
-                var lastLogged = LogUtil.LastLogged;
-                var delta = time - lastLogged;
-                var gap = TimeSpan.FromSeconds(Interval) - delta;
-
-                if (gap <= TimeSpan.Zero)
-                {
-                    var idle = !Bot.Config.AcceptingCommands ? UserStatus.DoNotDisturb : UserStatus.Idle;
-                    if (idle != state)
-                    {
-                        state = idle;
-                        await _client.SetStatusAsync(state).ConfigureAwait(false);
-                    }
-                    await Task.Delay(2_000, token).ConfigureAwait(false);
-                    continue;
-                }
-
-                var active = !Bot.Config.AcceptingCommands ? UserStatus.DoNotDisturb : UserStatus.Online;
-                if (active != state)
-                {
-                    state = active;
-                    await _client.SetStatusAsync(state).ConfigureAwait(false);
-                }
-                await Task.Delay(gap, token).ConfigureAwait(false);
+                var update = CheckState(out var millisecondsDelay);
+                if (state != update)
+                    await _client.SetStatusAsync(state = update).ConfigureAwait(false);
+                await Task.Delay(millisecondsDelay, token).ConfigureAwait(false);
             }
+        }
+
+        private UserStatus CheckState(out int delay)
+        {
+            delay = 2_000;
+            if (!Bot.Config.AcceptingCommands)
+                return UserStatus.DoNotDisturb;
+
+            // Check datetime for update; if logged anything in past 20 seconds, we're active.
+            const int Interval = 20_000;
+            var delta = DateTime.Now - LogUtil.LastLogged;
+            var gap = TimeSpan.FromMinutes(Interval) - delta;
+
+            delay = Math.Max(delay, gap.Milliseconds);
+            return gap > TimeSpan.Zero ? UserStatus.Online : UserStatus.Idle;
         }
     }
 }
