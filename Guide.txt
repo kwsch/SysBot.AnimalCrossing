@@ -1,0 +1,38 @@
+TWITCH_ENABLED (Enables the use of twitch with the bot, be sure to enter credentials however or immediate crash will occur on run)
+TWITCH_USERNAME (is the username of twitch account)
+TWITCH_CHANNEL (is the username of the twitch channel you want to connect bot to)
+TWITCH_TOKEN (is your access token, collect this with an online generator)
+TWITCH_SHARE_DODO (Twitch bot will reveal dodo to the chat, opposed to leave/join events)
+ISLAND_GIVEAWAY_TIMER (*TESTING* The host will wait till a minimum user count is met, then reach into inventory to start the stop-watch and wait 5m20s to boot all users then repeat if no crash is detected.)
+ISLAND_GIVEAWAY_MINIMUM (Set this to 8, if you want a full lobby during giveaway, otherwise 2-3 for testing.)
+DISCORD_ACCEPTINGDROPS (Toggles drop command for users, sudo's can switch this on/off. So be mindful to set things up properly)
+DISCORD_ACCEPTINGLOOKUPS (Toggles the lookup command for users, sudo's can switch this on/off. This can stay off if HorizonLookUp is added to server and given its own channel for public use.)
+DISCORD_NAME (Give your bot a name!)
+DISCORD_TOKEN (Authenticate your bot)
+DISCORD_PREFIX (Set the initial character that tells the bot incomming message is a command, be careful however of clashing bots and or message inserts using things like #)
+DISCORD_ROLECUSTOM (Users with these roles have access to the bots functions outside of sudo commands. Left empty anyone with access to bots channels can use bot.)
+DISCORD_QUEUECHANNEL (You can set the channels you wish to have the queue report in, these channels if given just write permission will just report queue; if allowed read/write, bot will allow just dodo/code as command to be entered for dodo retrieval unless the channel is specified for drops or sudo)
+DISCORD_CHANNELS (Channel IDs that can actively use the bot for passing commands. Sudos can use any channel that the bot appears in and has permissions in. These channels for commands by default have no active queue report however if you desire the queue to be on the same channel as any of these selected, add them as well)
+DISCORD_USERS (By default which is blank, all users can use the bot if the channel is made available to them; this option usually doesn't need changing but it's there.)
+DISCORD_SUDO (By default server-owner has sudo which grants access to all commands, so carefully give this feature to those you trust. Common mistake users keep bots public and other users invite them to their server to abuse; don't make this mistake!)
+SKIP_CONSOLE_BOT_CREATION (If set true, the bot will not initialize however chat-bots will attempt to connect for diagnosing. This really only needs toggling for dev purposes.)
+ISLAND_NAME (Your island name, set this to whatever you want!)
+INVENTORY_OFFSET (Inventory offset, a place we inject itemms. This too is for developers, would avoid unless new patch reveals it changed.
+STRING_OFFSET_SEARCH (For testing purposes. If offset hunting, you can confirm your strings but entering the offset you found and calling the pull command (listed in help))
+DISABLED_ITEMID_DECVAL (So everyone can use the itembot safely, I've compiled a list of blocked items that will cause issues. All these values were converted from hex to dec so if adding more items to the list be sure to convert. This option prevents any of the items from being dropped)
+
+
+Command basics (for sudos)
+detach (will disconnect the remote controller for temporary access by the joycons. Bot will auto reconnect next action.)
+setCode (is not needed anymore; but you can fuck with people for twenty seconds).
+toggleRequests (drops enabled/disabled.)
+togglelookups (lookup enabled/disabled.)
+toggletwitchdodo (show/hide dodo from chat)
+mutetwitch (Stop bot from posting entirely).
+droplimit (Set  how much a user can drop in a single message worth of items, 1-40 max; This does not prevent users from multiple use but to take turns!)
+stopmove (if player is moving and you need them to stop cause of a bug/glitch to take control again remotely)
+click (any of the buttons case-insensitive)
+walk (direction and how long in MS ex. walk up 1000  for 1 second walk upwards *feature needs minor tune-up*)
+airport (This command should send your player to go retrieve dodo and wait outside on the dock nicely. If giveaway is set true then an attempt is made to loop and repeat the e vent)
+pulloffset (if  experimenting with noexes you can trial this for when you update the config file with a new offset to search.
+

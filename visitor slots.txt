@@ -1,0 +1,42 @@
+Players On Island:
+P1 - 164732848
+P2 = 164731752
+P3 = 164730656
+P4 = 164729560
+P5 = 164728464
+P6 = 164727368
+P7 = 164726272
+P8 = 164725176
+
+
+There's a total of 7 Players on island (excluding host) represented as (P);
+The P state is locked till the user has left, new joining users get the lowest available P.
+
+The length is 8-bytes
+
+Ex.
+
+P2 is Tommy, P3 is Jimmy; if Tommy leaves, P2 is available/empty; If Sarah joins, she gets P2; If Tommy Joins they get P4.
+
+Found by: CosmosisT#3942 & Zyro#0809
+
+
+Dodo Code Offset
+0xA95E0F4
+
+
+
+OFFSETS FOR PLAYERS ON ISLAND (INCLUDING HOST)
+
+Player On Island 1: 0x9D19FB0
+Player On Island 2: 0x9D19B68
+Player On Island 3: 0x9D19720
+Player On Island 4: 0x9D192D8
+Player On Island 5: 0x9D18E90
+Player On Island 6: 0x9D18A48
+Player On Island 7: 0x9D18600
+Player On Island 8: 0x9D181B8
+
+
+
+

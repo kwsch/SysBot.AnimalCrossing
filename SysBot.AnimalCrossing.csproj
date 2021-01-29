@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp3.1;net47</TargetFrameworks>
+    <LangVersion>8</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Discord.Net" Version="2.2.0" />
+    <PackageReference Include="Discord.Net.Core" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
+    <PackageReference Include="NLog" Version="4.7.3" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="TwitchLib" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="NHSE.Core">
+      <HintPath>deps\NHSE.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SysBot.Base">
+      <HintPath>deps\SysBot.Base.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

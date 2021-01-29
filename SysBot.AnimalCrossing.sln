@@ -3,15 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossBot.ConsoleApp", "CrossBot.ConsoleApp\CrossBot.ConsoleApp.csproj", "{EF7676A2-DF5A-49E8-BF8E-F522CE5FCAC3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossBot.Core", "CrossBot.Core\CrossBot.Core.csproj", "{2582DFA1-1381-44A6-8B91-0A9F8484F5CA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossBot.Discord", "CrossBot.Discord\CrossBot.Discord.csproj", "{282DA37D-B599-40AB-9DC8-90E6FC31F358}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossBot.SysBot", "CrossBot.SysBot\CrossBot.SysBot.csproj", "{DFB3266A-04BF-45A7-B2F4-33E734E34452}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossBot.Tests", "CrossBot.Tests\CrossBot.Tests.csproj", "{0B0AA782-C75C-40BF-8643-537E84C864AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SysBot.AnimalCrossing", "SysBot.AnimalCrossing.csproj", "{EF7676A2-DF5A-49E8-BF8E-F522CE5FCAC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,22 +15,6 @@ Global
 		{EF7676A2-DF5A-49E8-BF8E-F522CE5FCAC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF7676A2-DF5A-49E8-BF8E-F522CE5FCAC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF7676A2-DF5A-49E8-BF8E-F522CE5FCAC3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2582DFA1-1381-44A6-8B91-0A9F8484F5CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2582DFA1-1381-44A6-8B91-0A9F8484F5CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2582DFA1-1381-44A6-8B91-0A9F8484F5CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2582DFA1-1381-44A6-8B91-0A9F8484F5CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{282DA37D-B599-40AB-9DC8-90E6FC31F358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{282DA37D-B599-40AB-9DC8-90E6FC31F358}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{282DA37D-B599-40AB-9DC8-90E6FC31F358}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{282DA37D-B599-40AB-9DC8-90E6FC31F358}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DFB3266A-04BF-45A7-B2F4-33E734E34452}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFB3266A-04BF-45A7-B2F4-33E734E34452}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFB3266A-04BF-45A7-B2F4-33E734E34452}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFB3266A-04BF-45A7-B2F4-33E734E34452}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0B0AA782-C75C-40BF-8643-537E84C864AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0B0AA782-C75C-40BF-8643-537E84C864AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0B0AA782-C75C-40BF-8643-537E84C864AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0B0AA782-C75C-40BF-8643-537E84C864AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
