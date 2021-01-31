@@ -112,5 +112,34 @@ namespace CrossBot.Discord
             var vs = Globals.Bot.ViewState;
             await vs.SetCoordinates(x, y, CancellationToken.None).ConfigureAwait(false);
         }
+
+        [Command("resetPosition")]
+        [Alias("rp")]
+        [Summary("Resets the bot position to the configured coordinates.")]
+        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+        public async Task ResetPositionAsync()
+        {
+            var bot = Globals.Bot;
+            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            {
+                await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
+                return;
+            }
+
+            var cfg = Globals.Bot.Config.ViewConfig;
+            if (!cfg.AllowTeleportation)
+            {
+                await ReplyAsync("Teleportation has been disabled by the Bot owner.").ConfigureAwait(false);
+                return;
+            }
+
+            if (cfg.DropX == 0 || cfg.DropY == 0)
+            {
+                await ReplyAsync("Teleportation has not been configured by the Bot owner.").ConfigureAwait(false);
+                return;
+            }
+
+            await SetCoordinatesAsync(cfg.DropX, cfg.DropY).ConfigureAwait(false);
+        }
     }
 }
