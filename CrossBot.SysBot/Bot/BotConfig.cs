@@ -59,5 +59,10 @@ namespace CrossBot.SysBot
         /// Amount of up-time (in seconds) to determine if the bot is running without fault.
         /// </summary>
         public int UptimeThreshold { get; set; } = 60;
+
+        /// <summary>
+        /// Maximum amount of data to push over the connection. Leave at 0 or negative to not override the default connection maximums from SysBot.NET
+        /// </summary>
+        public int MaximumTransferSize { get; set; } = -1;
     }
 }

@@ -62,6 +62,10 @@ namespace CrossBot.ConsoleApp
             Task.Run(() => sys.MainAsync(cfgDiscord.Token, cfgDiscord, token), token);
 #pragma warning restore 4014
 
+            // Configure bot if settings require
+            if (cfgBot.MaximumTransferSize > 0)
+                bot.Connection.MaximumTransferSize = cfgBot.MaximumTransferSize;
+
             await BotRunner.RunFrom(bot, token).ConfigureAwait(false);
             WaitKeyExit();
             cts.Cancel();
