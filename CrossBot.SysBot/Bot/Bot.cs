@@ -17,48 +17,53 @@ namespace CrossBot.SysBot
         {
             DropState = new DropBotState(cfg.DropConfig);
             FieldItemState = new FieldItemState(cfg.FieldItemConfig);
+            ViewState = new AdvancedViewState(this);
         }
 
         public readonly DropBotState DropState;
         public readonly FieldItemState FieldItemState;
+        public readonly AdvancedViewState ViewState;
 
         public override void SoftStop() => Config.AcceptingCommands = false;
 
         public override async Task MainLoop(CancellationToken token)
         {
-            // Validate our config.
-            var coord = Config.FieldItemConfig.ValidateCoordinates();
-            if (coord != CoordinateResult.Valid)
+            if (!await BotStartup.ValidateStartup(this, token).ConfigureAwait(false))
             {
-                Log($"Coordinates are not valid! {coord}. Exiting!");
+                Log("Exiting!");
                 return;
-            }
-
-            // Disconnect our virtual controller; will reconnect once we send a button command after a request.
-            Log("Detaching controller on startup as first interaction.");
-            await Connection.SendAsync(SwitchCommand.DetachController(UseCRLF), token).ConfigureAwait(false);
-            await Task.Delay(200, token).ConfigureAwait(false);
-
-            // Validate inventory offset.
-            Log("Checking inventory offset for validity.");
-            var valid = await GetIsPlayerInventoryValid(Config.Offset, token).ConfigureAwait(false);
-            if (!valid)
-            {
-                Log($"Inventory read from {Config.Offset} (0x{Config.Offset:X8}) does not appear to be valid.");
-                if (Config.RequireValidInventoryMetadata)
-                {
-                    Log("Exiting!");
-                    return;
-                }
             }
 
             Log("Successfully connected to bot. Starting main loop!");
             while (!token.IsCancellationRequested)
-                await DropLoop(token).ConfigureAwait(false);
+            {
+                var result = await DropLoop(token).ConfigureAwait(false);
+                if (result)
+                    continue;
+                Log("Exiting!");
+                break;
+            }
         }
 
-        private async Task DropLoop(CancellationToken token)
+        private async Task<bool> DropLoop(CancellationToken token)
         {
+            // Check if our session is still active.
+            if (!Config.ViewConfig.SkipSessionCheck && !await ViewState.IsLinkSessionActive(token).ConfigureAwait(false))
+            {
+                Log("Link Session appears to have ended. Attempting to re-open gates.");
+                if (!await ViewState.StartupOpenGates(this, token).ConfigureAwait(false))
+                {
+                    Log("Opening gates has failed. Stopping bot loop.");
+                    return false;
+                }
+
+                if (!await ViewState.StartupGetDodoCode(this, token).ConfigureAwait(false))
+                {
+                    Log("Unable to retrieve new dodo code. Stopping bot loop.");
+                    return false;
+                }
+            }
+
             if (DropState.ValidateRequested)
             {
                 Log("Checking inventory offset for validity.");
@@ -78,7 +83,7 @@ namespace CrossBot.SysBot
             if (!Config.AcceptingCommands)
             {
                 await Task.Delay(1_000, token).ConfigureAwait(false);
-                return;
+                return true;
             }
 
             if (DropState.Injections.TryDequeue(out var item))
@@ -129,14 +134,13 @@ namespace CrossBot.SysBot
                 DropState.StillIdle();
                 await Task.Delay(1_000, token).ConfigureAwait(false);
             }
+
+            return true;
         }
 
-        private static bool GetIsFieldItemOffsetValid(in uint ofs)
-        {
-            return ofs > 100; // no validation besides checking if they configured something... lol
-        }
+        #region Player Inventory
 
-        private async Task<bool> GetIsPlayerInventoryValid(uint playerOfs, CancellationToken token)
+        public async Task<bool> GetIsPlayerInventoryValid(uint playerOfs, CancellationToken token)
         {
             PlayerItemSet.GetOffsetLength(playerOfs, out var ofs, out var len);
             var inventory = await Connection.ReadBytesAsync(ofs, len, token).ConfigureAwait(false);
@@ -211,6 +215,15 @@ namespace CrossBot.SysBot
             }
         }
 
+        #endregion
+
+        #region Field Item
+
+        private static bool GetIsFieldItemOffsetValid(in uint ofs)
+        {
+            return ofs > 100; // no validation besides checking if they configured something... lol
+        }
+
         private async Task InjectDroppedItems(SpawnRequest itemSet, uint fiOffset, CancellationToken token)
         {
             foreach (var column in itemSet.Items)
@@ -219,5 +232,7 @@ namespace CrossBot.SysBot
                 Log($"Wrote {column.Data.Length / Item.SIZE} tiles to field item map @ ({column.X},{column.Y}).");
             }
         }
+
+        #endregion
     }
 }

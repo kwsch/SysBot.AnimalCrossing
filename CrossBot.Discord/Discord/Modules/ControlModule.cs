@@ -92,5 +92,54 @@ namespace CrossBot.Discord
             Globals.Bot.DropState.ValidateRequested = true;
             await ReplyAsync("A validate request will be executed momentarily. Check the logs for the result.").ConfigureAwait(false);
         }
+
+        [Command("getCoordinates")]
+        [Summary("Gets the current coordinates of the bot.")]
+        [RequireSudo]
+        public async Task GetCoordinatesAsync()
+        {
+            var vs = Globals.Bot.ViewState;
+            var (x, y) = await vs.GetCoordinates(CancellationToken.None).ConfigureAwait(false);
+            await ReplyAsync($"X:{x} Y:{y}.").ConfigureAwait(false);
+        }
+
+        [Command("setCoordinates")]
+        [Summary("Sets the current coordinates of the bot.")]
+        [RequireSudo]
+        public async Task SetCoordinatesAsync(ushort x, ushort y)
+        {
+            await ReplyAsync($"Warping to X:{x} Y:{y}.").ConfigureAwait(false);
+            var vs = Globals.Bot.ViewState;
+            await vs.SetCoordinates(x, y, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Command("resetPosition")]
+        [Alias("rp")]
+        [Summary("Resets the bot position to the configured coordinates.")]
+        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+        public async Task ResetPositionAsync()
+        {
+            var bot = Globals.Bot;
+            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            {
+                await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
+                return;
+            }
+
+            var cfg = Globals.Bot.Config.ViewConfig;
+            if (!cfg.AllowTeleportation)
+            {
+                await ReplyAsync("Teleportation has been disabled by the Bot owner.").ConfigureAwait(false);
+                return;
+            }
+
+            if (cfg.DropX == 0 || cfg.DropY == 0)
+            {
+                await ReplyAsync("Teleportation has not been configured by the Bot owner.").ConfigureAwait(false);
+                return;
+            }
+
+            await SetCoordinatesAsync(cfg.DropX, cfg.DropY).ConfigureAwait(false);
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace CrossBot.Discord
 {
+    [Serializable]
     public class DiscordBotConfig
     {
         /// <summary> Custom Discord Status for playing a game. </summary>
