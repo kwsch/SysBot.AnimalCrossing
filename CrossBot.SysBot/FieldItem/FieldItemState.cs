@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
+using CrossBot.Core;
 using NHSE.Core;
 using SysBot.Base;
 
@@ -9,7 +9,7 @@ namespace CrossBot.SysBot
 {
     public class FieldItemState
     {
-        public readonly ConcurrentQueue<IReadOnlyList<FieldItemColumn>> Injections = new();
+        public readonly ConcurrentQueue<SpawnRequest> Injections = new();
         public readonly FieldItemConfig Config;
         private DateTime FieldItemInjectedTime = DateTime.MinValue;
         public byte[] FieldItemLayer = Array.Empty<byte>();
@@ -89,6 +89,11 @@ namespace CrossBot.SysBot
                 return;
 
             Y = Config.SpawnMinY;
+        }
+
+        public void AfterSpawn(SpawnRequest itemSet)
+        {
+            itemSet.NotifyFinished();
         }
     }
 }

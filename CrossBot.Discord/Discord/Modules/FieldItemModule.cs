@@ -81,8 +81,19 @@ namespace CrossBot.Discord
             }
 
             var column = FieldItemDropper.InjectItemsAsDropped(x, y, items, height);
-            fi.Injections.Enqueue(column);
-            var msg = $"Item spawn request{(items.Count > 1 ? "s" : string.Empty)} {atCoords} will be executed momentarily.";
+            var mention = Context.User.Mention;
+            var request = new SpawnRequest(Context.User.Username, Context.User.Id, column)
+            {
+                OnFinish = success =>
+                {
+                    var reply = success
+                        ? "Items have been spawned on the map. Please pick them up!"
+                        : "Failed to spawn items. Please tell the bot owner to look at the logs!";
+                    Task.Run(async () => await ReplyAsync($"{mention}: {reply}").ConfigureAwait(false));
+                }
+            };
+            fi.Injections.Enqueue(request);
+            var msg = $"{mention}: Item spawn request{(items.Count > 1 ? "s" : string.Empty)} {atCoords} have been added to the queue and will be spawned momentarily.";
             await ReplyAsync(msg).ConfigureAwait(false);
         }
     }

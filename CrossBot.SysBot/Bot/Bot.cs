@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using CrossBot.Core;
 using NHSE.Core;
@@ -90,7 +89,9 @@ namespace CrossBot.SysBot
             if (DropState.Injections.TryDequeue(out var item))
             {
                 var count = await DropItems(item, token).ConfigureAwait(false);
-                DropState.AfterDrop(count);
+                item.Injected = count == item.Items.Count;
+                Log($"Dropped {count}/{item.Items.Count} items for {item.User} ({item.UserID}).");
+                DropState.AfterDrop(item, count);
             }
             else if ((DropState.CleanRequired && DropState.Config.AutoClean) || DropState.CleanRequested)
             {
@@ -112,13 +113,21 @@ namespace CrossBot.SysBot
                 }
                 FieldItemState.AfterFullRefresh();
             }
-            else if (FieldItemState.Injections.TryDequeue(out var itemSet))
+            else if (FieldItemState.Injections.TryDequeue(out var fieldSpawn))
             {
                 var ofs = FieldItemState.Config.FieldItemOffset;
                 if (!GetIsFieldItemOffsetValid(ofs))
+                {
                     Log("Bad Field Item offset detected. Please configure it -- there is no validation!");
+                    Log($"Failed to spawn for {fieldSpawn.User} ({fieldSpawn.UserID}).");
+                }
                 else
-                    await InjectDroppedItems(itemSet, ofs, token).ConfigureAwait(false);
+                {
+                    await InjectDroppedItems(fieldSpawn, ofs, token).ConfigureAwait(false);
+                    Log($"Dropped {fieldSpawn.Items.Count} items for {fieldSpawn.User} ({fieldSpawn.UserID}).");
+                    fieldSpawn.Injected = true;
+                }
+                FieldItemState.AfterSpawn(fieldSpawn);
             }
             else
             {
@@ -139,7 +148,7 @@ namespace CrossBot.SysBot
             return PlayerItemSet.ValidateItemBinary(inventory);
         }
 
-        private async Task<int> DropItems(ItemRequest drop, CancellationToken token)
+        private async Task<int> DropItems(DropRequest drop, CancellationToken token)
         {
             int dropped = 0;
             bool first = true;
@@ -215,9 +224,9 @@ namespace CrossBot.SysBot
             return ofs > 100; // no validation besides checking if they configured something... lol
         }
 
-        private async Task InjectDroppedItems(IReadOnlyList<FieldItemColumn> itemSet, uint fiOffset, CancellationToken token)
+        private async Task InjectDroppedItems(SpawnRequest itemSet, uint fiOffset, CancellationToken token)
         {
-            foreach (var column in itemSet)
+            foreach (var column in itemSet.Items)
             {
                 await Connection.WriteBytesAsync(column.Data, fiOffset + (uint)column.Offset, token).ConfigureAwait(false);
                 Log($"Wrote {column.Data.Length / Item.SIZE} tiles to field item map @ ({column.X},{column.Y}).");
