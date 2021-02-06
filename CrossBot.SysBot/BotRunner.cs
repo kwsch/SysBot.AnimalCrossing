@@ -26,7 +26,7 @@ namespace CrossBot.SysBot
                 if (faultCount != 0)
                 {
                     await Task.Delay(5_000, cancel).ConfigureAwait(false);
-                    bot.CleanRequested = true;
+                    bot.DropState.CleanRequested = true;
                     bot.Log("Restarting bot loop.");
                 }
 
@@ -58,7 +58,7 @@ namespace CrossBot.SysBot
             bot.Log("Bot execution has terminated.");
         }
 
-        private static void LogError(IConsoleConnectionAsync connection, Task task)
+        private static void LogError(IConsoleConnection connection, Task task)
         {
             if (task.Exception == null)
             {

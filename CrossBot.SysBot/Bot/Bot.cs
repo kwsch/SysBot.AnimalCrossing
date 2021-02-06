@@ -12,9 +12,6 @@ namespace CrossBot.SysBot
     /// </summary>
     public sealed class Bot : SwitchRoutineExecutor<BotConfig>
     {
-        public bool CleanRequested { private get; set; }
-        public bool ValidateRequested { private get; set; }
-
         public readonly IslandState Island = new();
 
         public Bot(BotConfig cfg) : base(cfg)
@@ -68,7 +65,7 @@ namespace CrossBot.SysBot
                 }
             }
 
-            if (ValidateRequested)
+            if (DropState.ValidateRequested)
             {
                 Log("Checking inventory offset for validity.");
                 var valid = await GetIsPlayerInventoryValid(Config.Offset, token).ConfigureAwait(false);
@@ -81,7 +78,7 @@ namespace CrossBot.SysBot
                         Config.AcceptingCommands = false;
                     }
                 }
-                ValidateRequested = false;
+                DropState.ValidateRequested = false;
             }
 
             if (!Config.AcceptingCommands)
@@ -95,11 +92,10 @@ namespace CrossBot.SysBot
                 var count = await DropItems(item, token).ConfigureAwait(false);
                 DropState.AfterDrop(count);
             }
-            else if ((DropState.CleanRequired && DropState.Config.AutoClean) || CleanRequested)
+            else if ((DropState.CleanRequired && DropState.Config.AutoClean) || DropState.CleanRequested)
             {
                 await CleanUp(DropState.Config.PickupCount, token).ConfigureAwait(false);
                 DropState.AfterClean();
-                CleanRequested = false;
             }
             else if (FieldItemState.FullRefreshRequired)
             {
