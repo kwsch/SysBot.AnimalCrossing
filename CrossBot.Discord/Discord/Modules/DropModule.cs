@@ -117,10 +117,20 @@ namespace CrossBot.Discord
             }
 
             var user = Context.User;
-            var requestInfo = new ItemRequest(user.Username, user.Id, items);
+            var mention = Context.User.Mention;
+            var requestInfo = new DropRequest(user.Username, user.Id, items)
+            {
+                OnFinish = success =>
+                {
+                    var reply = success
+                        ? "Items have been dropped by the bot. Please pick them up!"
+                        : "Failed to inject items. Please tell the bot owner to look at the logs!";
+                    Task.Run(async () => await ReplyAsync($"{mention}: {reply}").ConfigureAwait(false));
+                }
+            };
             Globals.Bot.DropState.Injections.Enqueue(requestInfo);
 
-            var msg = $"Item drop request{(requestInfo.Items.Count > 1 ? "s" : string.Empty)} will be executed momentarily.";
+            var msg = $"{mention}: Item drop request{(requestInfo.Items.Count > 1 ? "s" : string.Empty)} have been added to the queue and will be dropped momentarily.";
             await ReplyAsync(msg).ConfigureAwait(false);
         }
     }
