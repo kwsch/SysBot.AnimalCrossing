@@ -48,7 +48,7 @@ namespace CrossBot.SysBot
         private async Task<bool> DropLoop(CancellationToken token)
         {
             // Check if our session is still active.
-            if (!await ViewState.IsLinkSessionActive(token).ConfigureAwait(false))
+            if (!Config.ViewConfig.SkipSessionCheck && !await ViewState.IsLinkSessionActive(token).ConfigureAwait(false))
             {
                 Log("Link Session appears to have ended. Attempting to re-open gates.");
                 if (!await ViewState.StartupOpenGates(this, token).ConfigureAwait(false))

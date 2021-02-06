@@ -22,6 +22,9 @@ namespace CrossBot.SysBot
             if (!inventoryValid)
                 return false;
 
+            if (b.Config.ViewConfig.SkipSessionCheck)
+                return true;
+
             var sessionActive = await b.ViewState.IsLinkSessionActive(token).ConfigureAwait(false);
             if (sessionActive)
                 return await b.ViewState.StartupGetDodoCode(b, token, true).ConfigureAwait(false);

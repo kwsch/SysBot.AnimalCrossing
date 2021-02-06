@@ -11,6 +11,9 @@ namespace CrossBot.SysBot
         /// <summary> Allows opening the gates via calculated procedure. </summary>
         public bool DodoCodeRetrieval { get; set; } = true;
 
+        /// <summary> Skips the bot checks for startup, including retrieval of dodo code. </summary>
+        public bool SkipSessionCheck { get; set; } = true;
+
         /// <summary> Offset the player coordinate pointer is located at. </summary>
         public string CoordinatePointer { get; set; } = "[[[[main+37D6A40]+18]+178]+D0]+DA";
 
