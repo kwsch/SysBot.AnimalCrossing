@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CrossBot.Core;
 using Discord.Commands;
 using NHSE.Core;
 
@@ -29,29 +30,14 @@ namespace CrossBot.Discord
             }
 
             var att1 = Context.Message.Attachments.ElementAt(0);
-            var fn = att1.Filename;
-            if (!fn.EndsWith(".nhi"))
+            var max = Globals.Bot.Config.FieldItemConfig.MaxSpawnCount * 4;
+            var (code, items) = await DiscordUtil.TryDownloadItems(att1, max).ConfigureAwait(false);
+            if (code != DownloadResult.Success)
             {
-                await ReplyAsync("I only accept `nhi` files.").ConfigureAwait(false);
+                var msg = DiscordUtil.GetItemErrorMessage(code, max);
+                await ReplyAsync(msg).ConfigureAwait(false);
                 return;
             }
-
-            var size = att1.Size;
-            if (size % Item.SIZE != 0 || size == 0)
-            {
-                await ReplyAsync("That `nhi` does not appear to be a valid size.").ConfigureAwait(false);
-                return;
-            }
-
-            var max = Globals.Bot.FieldItemState.Config.MaxSpawnCount * 10;
-            if (size > Item.SIZE * max)
-            {
-                await ReplyAsync($"That `nhi` file is way too big. I only allow at most {max} items from an `nhi` file.").ConfigureAwait(false);
-                return;
-            }
-
-            var data = await NetUtil.DownloadFromUrlAsync(att1.Url).ConfigureAwait(false);
-            var items = Item.GetArray(data);
             await SpawnItems(items).ConfigureAwait(false);
         }
 
