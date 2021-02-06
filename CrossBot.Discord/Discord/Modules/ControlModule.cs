@@ -89,7 +89,7 @@ namespace CrossBot.Discord
                 await ReplyAsync("Validate functionality is currently disabled.").ConfigureAwait(false);
                 return;
             }
-            Globals.Bot.ValidateRequested = true;
+            Globals.Bot.DropState.ValidateRequested = true;
             await ReplyAsync("A validate request will be executed momentarily. Check the logs for the result.").ConfigureAwait(false);
         }
     }

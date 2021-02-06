@@ -28,7 +28,7 @@ namespace CrossBot.Discord
                 await ReplyAsync("Clean functionality is currently disabled.").ConfigureAwait(false);
                 return;
             }
-            Globals.Bot.CleanRequested = true;
+            Globals.Bot.DropState.CleanRequested = true;
             await ReplyAsync("A clean request will be executed momentarily.").ConfigureAwait(false);
         }
 

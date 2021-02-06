@@ -15,6 +15,9 @@ namespace CrossBot.SysBot
         private int DropCount;
         private int IdleCount;
 
+        public bool CleanRequested;
+        public bool ValidateRequested;
+
         public bool CleanRequired => DropCount != 0 && IdleCount > Config.NoActivitySeconds;
 
         public void AfterDrop(int count)
