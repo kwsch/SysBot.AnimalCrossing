@@ -26,7 +26,7 @@ namespace CrossBot.SysBot
                 await b.VillagerState.InitializeVillagers(token).ConfigureAwait(false);
 
             if (b.Config.ViewConfig.SkipSessionCheck)
-                return true;
+                return await StartupGetDodoCode(b.ViewState, b, token, true).ConfigureAwait(false);
 
             var sessionActive = await b.ViewState.IsLinkSessionActive(token).ConfigureAwait(false);
             if (sessionActive)
@@ -90,7 +90,10 @@ namespace CrossBot.SysBot
 
             var code = await s.GetDodoCode(token).ConfigureAwait(false);
             if (code == null)
+            {
+                b.Log("Unable to detect Dodo code.");
                 return false;
+            }
 
             b.Island.DodoCode = code;
             return true;
