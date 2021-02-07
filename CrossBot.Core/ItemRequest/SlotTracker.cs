@@ -14,9 +14,10 @@ namespace CrossBot.Core
 
         public SlotTracker(int count)
         {
+            var defaultTime = DateTime.UtcNow.Subtract(TimeSpan.FromDays(100));
             var revised = new DateTime[count];
             for (int i = 0; i < revised.Length; i++)
-                revised[i] = DateTime.UtcNow;
+                revised[i] = defaultTime;
             RevisedAt = revised;
         }
 
