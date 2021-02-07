@@ -40,7 +40,7 @@ namespace CrossBot.Core
     }
 
     /// <summary>
-    /// Contains details about an item request.
+    /// Contains details about a drop request.
     /// </summary>
     public sealed class DropRequest : ItemRequest<Item>
     {
@@ -50,7 +50,7 @@ namespace CrossBot.Core
     }
 
     /// <summary>
-    /// Contains details about an item request.
+    /// Contains details about a field item spawn request.
     /// </summary>
     public sealed class SpawnRequest : ItemRequest<FieldItemColumn>
     {

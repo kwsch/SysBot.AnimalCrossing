@@ -13,8 +13,8 @@ namespace CrossBot.Discord
         private static SlotTracker Tracker => Globals.Bot.VillagerState.Tracker;
         private static VillagerConfig Config => Globals.Bot.Config.VillagerConfig;
 
-        [Command("clean")]
-        [Summary("Picks up items around the bot.")]
+        [Command("injectVillager"), Alias("iv")]
+        [Summary("Injects a villager based on the internal name.")]
         [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
         public async Task InjectVillagerAsync(string internalName)
         {
