@@ -102,12 +102,7 @@ namespace CrossBot.SysBot
             }
             else if (FieldItemState.FullRefreshRequired)
             {
-                var ofs = FieldItemState.Config.FieldItemOffset;
-                if (!GetIsFieldItemOffsetValid(ofs))
-                {
-                    Log("Bad Field Item offset detected. Please configure it -- there is no validation!");
-                }
-                else
+                const uint ofs = Offsets.FieldItemStart;
                 {
                     var payload = FieldItemState.FieldItemLayer;
                     Log($"Writing Field Item Layer to 0x{ofs:X8}, size 0x{payload.Length:X} bytes.");
@@ -117,13 +112,7 @@ namespace CrossBot.SysBot
             }
             else if (FieldItemState.Injections.TryDequeue(out var fieldSpawn))
             {
-                var ofs = FieldItemState.Config.FieldItemOffset;
-                if (!GetIsFieldItemOffsetValid(ofs))
-                {
-                    Log("Bad Field Item offset detected. Please configure it -- there is no validation!");
-                    Log($"Failed to spawn for {fieldSpawn.User} ({fieldSpawn.UserID}).");
-                }
-                else
+                const uint ofs = Offsets.FieldItemStart;
                 {
                     await InjectDroppedItems(fieldSpawn, ofs, token).ConfigureAwait(false);
                     Log($"Dropped {fieldSpawn.Items.Count} items for {fieldSpawn.User} ({fieldSpawn.UserID}).");
@@ -224,11 +213,6 @@ namespace CrossBot.SysBot
         #endregion
 
         #region Field Item
-
-        private static bool GetIsFieldItemOffsetValid(in uint ofs)
-        {
-            return ofs > 100; // no validation besides checking if they configured something... lol
-        }
 
         private async Task InjectDroppedItems(SpawnRequest itemSet, uint fiOffset, CancellationToken token)
         {

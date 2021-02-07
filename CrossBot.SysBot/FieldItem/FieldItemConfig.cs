@@ -7,9 +7,6 @@ namespace CrossBot.SysBot
     [Serializable]
     public class FieldItemConfig
     {
-        /// <summary> Offset the Field Item Layer 1 starts at. Shouldn't be zero. </summary>
-        public uint FieldItemOffset { get; set; }
-
         #region Layer
 
         /// <summary> Path to load the Field Item layer that is automatically refreshed. </summary>

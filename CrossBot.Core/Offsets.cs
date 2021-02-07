@@ -11,14 +11,6 @@ namespace CrossBot.Core
         public const uint PlayerSize = 0x10E3A8;
         public const uint PlayerOtherStartPadding = 0x36A50;
 
-        // PlayerOther 
-        public const uint InventoryOffset = 0xACDAD530; // player 0 (A)
-        private const uint PlayerOtherStart = InventoryOffset - 0x10; // helps to get other values, unused 
-
-        public const uint WalletAddress = InventoryOffset + 0xB8;
-        public const uint MilesAddress = InventoryOffset - 0x25590;
-        public const uint BankAddress = InventoryOffset + 0x224CC;
-
         // Main player offsets functions
         private static uint GetPlayerStart(uint inventoryOffset) => inventoryOffset - 0x10 - PlayerOtherStartPadding + 0x110;
         public static uint GetPlayerIdAddress(uint inventoryOffset) => GetPlayerStart(inventoryOffset) + 0xAFA8;
@@ -34,9 +26,6 @@ namespace CrossBot.Core
         public static uint GetVillagerHouseOffset(int index) => VillagerHouseAddress + (uint)(Villager2.SIZE * index);
 
         public const uint FieldItemStart = VillagerAddress - 0x10 + 0x20ac08;
-        public const uint LandMakingMapStart = FieldItemStart + 0xAAA00;
-        public const uint OutsideFieldStart = FieldItemStart + 0xCF998;
-        public const uint MainFieldStructurStart = FieldItemStart + 0xCF600;
 
         // Other Addresses
         public const uint ArriverNameLocAddress = 0xB66F4EE0;
