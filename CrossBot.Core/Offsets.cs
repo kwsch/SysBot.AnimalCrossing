@@ -12,7 +12,7 @@ namespace CrossBot.Core
         public const uint PlayerOtherStartPadding = 0x36A50;
 
         public const uint InventoryOffset = 0xACDAD530; // player 0 (A)
-        public const string CoordinatePointer = "[[[[main+37D6A40]+18]+178]+D0]+DA";
+        public const string CoordinatePointer = "[[[[main+396F5A0]+18]+178]+D0]+DA";
 
         // Main player offsets functions
         private static uint GetPlayerStart(uint inventoryOffset) => inventoryOffset - 0x10 - PlayerOtherStartPadding + 0x110;
