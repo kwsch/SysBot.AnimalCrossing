@@ -23,7 +23,7 @@ namespace CrossBot.Discord
         public bool SkipDiscordBotCreation { get; set; }
 
         /// <summary> Sets the current Dodo code as the Bot's status. </summary>
-        public bool SetStatusAsDodoCode { get; set; }
+        public bool SetStatusAsDodoCode { get; set; } = true;
 
         // 64bit numbers white-listing certain channels/users for permission
         public List<ulong> Channels { get; set; } = new();
