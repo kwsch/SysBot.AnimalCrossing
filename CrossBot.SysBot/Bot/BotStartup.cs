@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using SysBot.Base;
 
@@ -88,14 +89,18 @@ namespace CrossBot.SysBot
                 return allowNoFetch;
             }
 
+            const string dodoFile = "dodo.txt";
             var code = await s.GetDodoCode(token).ConfigureAwait(false);
             if (code == null)
             {
                 b.Log("Unable to detect Dodo code.");
+                if (File.Exists(dodoFile))
+                    File.Delete(dodoFile);
                 return false;
             }
 
             b.Island.DodoCode = code;
+            File.WriteAllText(dodoFile, code);
             return true;
         }
     }

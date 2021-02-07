@@ -56,11 +56,18 @@ namespace CrossBot.ConsoleApp
             var cts = new CancellationTokenSource();
             var token = cts.Token;
             var bot = new Bot(cfgBot);
-            var sys = new SysCord(bot, cfgDiscord);
-            bot.Log("Starting Discord.");
+            if (!cfgBot.SkipDiscordBotCreation)
+            {
+                var sys = new SysCord(bot, cfgDiscord);
+                bot.Log("Starting Discord.");
 #pragma warning disable 4014
-            Task.Run(() => sys.MainAsync(cfgDiscord.Token, cfgDiscord, token), token);
+                Task.Run(() => sys.MainAsync(cfgDiscord.Token, cfgDiscord, token), token);
 #pragma warning restore 4014
+            }
+            else
+            {
+                bot.Log("Skipped Discord setup per config settings.");
+            }
 
             // Configure bot if settings require
             if (cfgBot.MaximumTransferSize > 0)
