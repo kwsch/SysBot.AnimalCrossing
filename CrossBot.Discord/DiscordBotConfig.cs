@@ -19,6 +19,12 @@ namespace CrossBot.Discord
         /// <summary> Users with this role are allowed to interact with the bot. If "@everyone", anyone can interact. </summary>
         public string RoleUseBot { get; set; } = "@everyone";
 
+        /// <summary> Skips creating the Discord bot (logging in); helpful for those not wanting interactions via Discord. </summary>
+        public bool SkipDiscordBotCreation { get; set; }
+
+        /// <summary> Sets the current Dodo code as the Bot's status. </summary>
+        public bool SetStatusAsDodoCode { get; set; }
+
         // 64bit numbers white-listing certain channels/users for permission
         public List<ulong> Channels { get; set; } = new();
         public List<ulong> Users { get; set; } = new();

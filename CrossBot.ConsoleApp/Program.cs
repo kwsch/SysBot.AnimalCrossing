@@ -56,7 +56,7 @@ namespace CrossBot.ConsoleApp
             var cts = new CancellationTokenSource();
             var token = cts.Token;
             var bot = new Bot(cfgBot);
-            if (!cfgBot.SkipDiscordBotCreation)
+            if (!cfgDiscord.SkipDiscordBotCreation)
             {
                 var sys = new SysCord(bot, cfgDiscord);
                 bot.Log("Starting Discord.");
