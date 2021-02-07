@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using CrossBot.Core;
 using CrossBot.SysBot;
 using Discord.Commands;
+using NHSE.Core;
 using NHSE.Villagers;
 
 namespace CrossBot.Discord
@@ -29,6 +32,9 @@ namespace CrossBot.Discord
                 await ReplyAsync("Villager functionality is currently disabled.").ConfigureAwait(false);
                 return;
             }
+
+            if (!VillagerResources.IsVillagerDataKnown(internalName))
+                internalName = GameInfo.Strings.VillagerMap.First(z => string.Equals(z.Value, internalName, StringComparison.InvariantCultureIgnoreCase)).Key;
 
             if (!Tracker.CanAdd(Config))
             {
@@ -63,6 +69,39 @@ namespace CrossBot.Discord
 
             var msg = $"{mention}: Villager inject request{(request.Items.Count > 1 ? "s have" : "has")} been added to the queue and will be injected momentarily.";
             await ReplyAsync(msg).ConfigureAwait(false);
+        }
+
+        [Command("villagerName")]
+        [Alias("vn", "nv", "name")]
+        [Summary("Gets the internal name of a villager.")]
+        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+        public async Task GetVillagerInternalNameAsync([Summary("Language code to search with")] string language, [Summary("Villager name")][Remainder] string villagerName)
+        {
+            var strings = GameInfo.GetStrings(language);
+            await ReplyVillagerName(strings, villagerName).ConfigureAwait(false);
+            await ReplyAsync($"Visitor count: {Globals.Bot.Island.Count}.").ConfigureAwait(false);
+        }
+
+        [Command("villagerName")]
+        [Alias("vn", "nv", "name")]
+        [Summary("Gets the internal name of a villager.")]
+        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+        public async Task GetVillagerInternalNameAsync([Summary("Villager name")][Remainder] string villagerName)
+        {
+            var strings = GameInfo.Strings;
+            await ReplyVillagerName(strings, villagerName).ConfigureAwait(false);
+        }
+
+        private async Task ReplyVillagerName(GameStrings strings, string villagerName)
+        {
+            var map = strings.VillagerMap;
+            var result = map.FirstOrDefault(z => string.Equals(villagerName, z.Value, StringComparison.InvariantCultureIgnoreCase));
+            if (string.IsNullOrWhiteSpace(result.Key))
+            {
+                await ReplyAsync($"No villager found of name {villagerName}.").ConfigureAwait(false);
+                return;
+            }
+            await ReplyAsync($"{villagerName}={result.Key}").ConfigureAwait(false);
         }
     }
 }
