@@ -14,9 +14,6 @@ namespace CrossBot.SysBot
         /// <summary> Skips the bot checks for startup, including retrieval of dodo code. </summary>
         public bool SkipSessionCheck { get; set; } = true;
 
-        /// <summary> Offset the player coordinate pointer is located at. </summary>
-        public string CoordinatePointer { get; set; } = "[[[[main+37D6A40]+18]+178]+D0]+DA";
-
         /// <summary> Delay between overworld state checks. </summary>
         public int OverworldLoopCheckDelay { get; set; } = 500;
 

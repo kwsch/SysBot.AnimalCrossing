@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using CrossBot.Core;
 using SysBot.Base;
 
 namespace CrossBot.SysBot
@@ -14,7 +15,7 @@ namespace CrossBot.SysBot
 
         public async Task Initialize(CancellationToken token)
         {
-            var exp = Executor.Config.ViewConfig.CoordinatePointer;
+            const string exp = Offsets.CoordinatePointer;
             CoordinateAddressIsland = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
 
             Executor.Log("Saving starting position.");
@@ -76,7 +77,7 @@ namespace CrossBot.SysBot
         public async Task WarpToDodoCounter(CancellationToken token)
         {
             // Get player's coordinate address when inside airport and teleport player to Dodo.
-            var exp = Executor.Config.ViewConfig.CoordinatePointer;
+            const string exp = Offsets.CoordinatePointer;
             CoordinateAddressAirport = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
 
             var coords = new byte[] {58, 67, 0, 0, 0, 0, 0, 0, 38, 67};
@@ -126,7 +127,7 @@ namespace CrossBot.SysBot
 
         public async Task<(ushort X, ushort Y)> GetCoordinates(CancellationToken token)
         {
-            var exp = Executor.Config.ViewConfig.CoordinatePointer;
+            const string exp = Offsets.CoordinatePointer;
             CoordinateAddressIsland = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
 
             var result = await Connection.ReadBytesAbsoluteAsync(CoordinateAddressIsland, PlayerCoordinateSize, token).ConfigureAwait(false);
@@ -137,7 +138,7 @@ namespace CrossBot.SysBot
 
         public async Task SetCoordinates(ushort x, ushort y, CancellationToken token)
         {
-            var exp = Executor.Config.ViewConfig.CoordinatePointer;
+            const string exp = Offsets.CoordinatePointer;
             var ofs = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
             await SetPosition(x, y, ofs, token).ConfigureAwait(false);
         }
