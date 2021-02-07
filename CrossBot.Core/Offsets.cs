@@ -11,11 +11,15 @@ namespace CrossBot.Core
         public const uint PlayerSize = 0x10E3A8;
         public const uint PlayerOtherStartPadding = 0x36A50;
 
+        public const uint InventoryOffset = 0xACDAD530; // player 0 (A)
+
         // Main player offsets functions
         private static uint GetPlayerStart(uint inventoryOffset) => inventoryOffset - 0x10 - PlayerOtherStartPadding + 0x110;
         public static uint GetPlayerIdAddress(uint inventoryOffset) => GetPlayerStart(inventoryOffset) + 0xAFA8;
         public static uint GetPlayerProfileMainAddress(uint inventoryOffset) => GetPlayerStart(inventoryOffset) + 0x116A0;
         public static uint GetManpu(uint inventoryOffset) => inventoryOffset - 0x10 + 0xAF7C + 72;
+
+        public static uint GetPlayerInventoryOffset(uint profiles) => (uint) (InventoryOffset + (PlayerSize * (profiles - 1)));
 
         // Main save offsets
         public const uint TurnipAddress = 0xABE151EC;

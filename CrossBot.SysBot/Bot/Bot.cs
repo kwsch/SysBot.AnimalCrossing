@@ -69,10 +69,10 @@ namespace CrossBot.SysBot
             if (DropState.ValidateRequested)
             {
                 Log("Checking inventory offset for validity.");
-                var valid = await GetIsPlayerInventoryValid(Config.Offset, token).ConfigureAwait(false);
+                var valid = await GetIsPlayerInventoryValid(Config.InventoryOffset, token).ConfigureAwait(false);
                 if (!valid)
                 {
-                    Connection.LogError($"Inventory read from {Config.Offset} (0x{Config.Offset:X8}) does not appear to be valid.");
+                    Connection.LogError($"Inventory read from {Config.InventoryOffset} (0x{Config.InventoryOffset:X8}) does not appear to be valid.");
                     if (Config.RequireValidInventoryMetadata)
                     {
                         Connection.LogError("Turning off command processing!");
@@ -170,7 +170,7 @@ namespace CrossBot.SysBot
 
             // Inject item.
             var data = item.ToBytesClass();
-            var poke = SwitchCommand.Poke(Config.Offset, data, UseCRLF);
+            var poke = SwitchCommand.Poke(Config.InventoryOffset, data, UseCRLF);
             await Connection.SendAsync(poke, token).ConfigureAwait(false);
             await Task.Delay(0_300, token).ConfigureAwait(false);
 
@@ -204,7 +204,7 @@ namespace CrossBot.SysBot
             for (int i = 0; i < count; i++)
             {
                 await Click(SwitchButton.Y, 2_000, token).ConfigureAwait(false);
-                var poke = SwitchCommand.Poke(Config.Offset, Item.NONE.ToBytes(), UseCRLF);
+                var poke = SwitchCommand.Poke(Config.InventoryOffset, Item.NONE.ToBytes(), UseCRLF);
                 await Connection.SendAsync(poke, token).ConfigureAwait(false);
                 await Task.Delay(1_000, token).ConfigureAwait(false);
             }

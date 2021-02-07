@@ -48,11 +48,11 @@ namespace CrossBot.SysBot
         private static async Task<bool> ValidateStartupInventory(Bot b, CancellationToken token)
         {
             b.Log("Checking inventory offset for validity.");
-            var valid = await b.GetIsPlayerInventoryValid(b.Config.Offset, token).ConfigureAwait(false);
+            var valid = await b.GetIsPlayerInventoryValid(b.Config.InventoryOffset, token).ConfigureAwait(false);
             if (valid)
                 return true;
 
-            b.Log($"Inventory read from {b.Config.Offset} (0x{b.Config.Offset:X8}) does not appear to be valid.");
+            b.Log($"Inventory read from {b.Config.InventoryOffset} (0x{b.Config.InventoryOffset:X8}) does not appear to be valid.");
             return !b.Config.RequireValidInventoryMetadata;
         }
 
