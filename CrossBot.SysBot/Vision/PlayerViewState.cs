@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CrossBot.Core;
 using SysBot.Base;
 
 namespace CrossBot.SysBot
@@ -11,8 +12,8 @@ namespace CrossBot.SysBot
         protected readonly ISwitchConnectionAsync Connection;
         protected readonly SwitchRoutineExecutor<BotConfig> Executor;
 
-        protected const uint LinkSessionActiveOffset = 0x91DD740;
-        protected const uint DodoCodeOffset = 0xA95E0F4;
+        protected const uint LinkSessionActiveOffset = Offsets.OnlineSessionAddress;
+        protected const uint DodoCodeOffset = Offsets.DodoAddress;
         protected ulong CoordinateAddressIsland;
         protected ulong CoordinateAddressAirport;
         protected const int PlayerCoordinateSize = 10;

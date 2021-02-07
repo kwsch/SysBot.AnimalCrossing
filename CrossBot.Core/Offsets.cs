@@ -29,9 +29,7 @@ namespace CrossBot.Core
 
         // Other Addresses
         public const uint ArriverNameLocAddress = 0xB66F4EE0;
-
         public const uint TextSpeedAddress = 0xBA21BB8;
-
         public const uint DodoAddress = 0xA97E15C;
         public const uint OnlineSessionAddress = 0x91FD740;
     }
