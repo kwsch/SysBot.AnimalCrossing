@@ -101,8 +101,11 @@ namespace CrossBot.SysBot
             await Executor.Click(SwitchButton.A, 1_000, token).ConfigureAwait(false);
             await Executor.Click(SwitchButton.A, 12_000, token).ConfigureAwait(false);
             await Executor.Click(SwitchButton.A, 1_500, token).ConfigureAwait(false);
-            await Executor.Click(SwitchButton.DDOWN, 0_300, token).ConfigureAwait(false);
-            await Executor.Click(SwitchButton.DDOWN, 0_300, token).ConfigureAwait(false);
+
+            // Navigate to "Invite Via Dodo Code"
+            await Executor.Click(SwitchButton.DUP, 0_300, token).ConfigureAwait(false);
+            await Executor.Click(SwitchButton.DUP, 0_300, token).ConfigureAwait(false);
+
             await Executor.Click(SwitchButton.A, 1_500, token).ConfigureAwait(false);
             await Executor.Click(SwitchButton.A, 1_000, token).ConfigureAwait(false);
             await Executor.Click(SwitchButton.DUP, 0_300, token).ConfigureAwait(false);
