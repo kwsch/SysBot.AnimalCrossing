@@ -220,11 +220,16 @@ namespace CrossBot.Discord
         private async Task MonitorStatusAsync(CancellationToken token)
         {
             var state = UserStatus.Idle;
+            var code = string.Empty;
             while (!token.IsCancellationRequested)
             {
                 var update = CheckState(out var millisecondsDelay);
                 if (state != update)
                     await _client.SetStatusAsync(state = update).ConfigureAwait(false);
+
+                if (Config.SetStatusAsDodoCode && code != Bot.Island.DodoCode)
+                    await _client.SetGameAsync($"{Config.Name}: {code = Bot.Island.DodoCode}").ConfigureAwait(false);
+
                 await Task.Delay(millisecondsDelay, token).ConfigureAwait(false);
             }
         }
