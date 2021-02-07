@@ -27,7 +27,7 @@ namespace CrossBot.Discord
                 await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
                 return;
             }
-            if (Globals.Bot.Config.VillagerConfig.AllowVillagerInjection)
+            if (!Globals.Bot.Config.VillagerConfig.AllowVillagerInjection)
             {
                 await ReplyAsync("Villager functionality is currently disabled.").ConfigureAwait(false);
                 return;
