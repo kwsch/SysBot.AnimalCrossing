@@ -18,11 +18,13 @@ namespace CrossBot.SysBot
             DropState = new DropBotState(cfg.DropConfig);
             FieldItemState = new FieldItemState(cfg.FieldItemConfig);
             ViewState = new AdvancedViewState(this);
+            VillagerState = new VillagerState(this, cfg.VillagerConfig);
         }
 
         public readonly DropBotState DropState;
         public readonly FieldItemState FieldItemState;
         public readonly AdvancedViewState ViewState;
+        public readonly VillagerState VillagerState;
 
         public override void SoftStop() => Config.AcceptingCommands = false;
 
@@ -128,6 +130,10 @@ namespace CrossBot.SysBot
                     fieldSpawn.Injected = true;
                 }
                 FieldItemState.AfterSpawn(fieldSpawn);
+            }
+            else if (VillagerState.Injections.TryDequeue(out var villagerInject))
+            {
+                await VillagerState.InjectVillager(villagerInject, token).ConfigureAwait(false);
             }
             else
             {

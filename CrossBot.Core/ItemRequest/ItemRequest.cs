@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NHSE.Core;
+using NHSE.Villagers;
 
 namespace CrossBot.Core
 {
@@ -56,5 +57,19 @@ namespace CrossBot.Core
         public SpawnRequest(string user, ulong userID, IReadOnlyCollection<FieldItemColumn> items) : base(user, userID, items)
         {
         }
+    }
+
+    /// <summary>
+    /// Contains details about a villager request.
+    /// </summary>
+    public class VillagerRequest : ItemRequest<VillagerData>
+    {
+        public VillagerRequest(string user, ulong userID, IReadOnlyCollection<VillagerData> items) : base(user, userID, items)
+        {
+            if (items.Count > 10)
+                throw new Exception("Too many villagers requested.");
+        }
+
+        public int Index { get; set; }
     }
 }

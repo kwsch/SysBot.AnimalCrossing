@@ -22,6 +22,9 @@ namespace CrossBot.SysBot
             if (!inventoryValid)
                 return false;
 
+            if (b.Config.VillagerConfig.AllowVillagerInjection)
+                await b.VillagerState.InitializeVillagers(token).ConfigureAwait(false);
+
             if (b.Config.ViewConfig.SkipSessionCheck)
                 return true;
 
