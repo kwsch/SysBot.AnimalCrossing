@@ -31,6 +31,7 @@ namespace CrossBot.SysBot
         {
             DropCount = 0;
             IdleCount = 0;
+            CleanRequested = false;
         }
 
         public void StillIdle()
