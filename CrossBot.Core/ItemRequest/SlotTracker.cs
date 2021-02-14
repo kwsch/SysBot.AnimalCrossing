@@ -21,16 +21,18 @@ namespace CrossBot.Core
             RevisedAt = revised;
         }
 
-        public bool CanAdd(ISlotSetting setting)
+        public bool CanAdd(ISlotSetting setting) => CanAdd(setting, DateTime.UtcNow);
+        public int Add() => Add(DateTime.UtcNow);
+
+        public bool CanAdd(ISlotSetting setting, DateTime time)
         {
-            var time = DateTime.UtcNow;
-            return RevisedAt.Any(z => (time - z).Seconds > setting.StaleSeconds);
+            return RevisedAt.Any(z => (time - z).TotalSeconds > setting.StaleSeconds);
         }
 
-        public int Add()
+        public int Add(DateTime time)
         {
-            var injectAt = Interlocked.Increment(ref NextIndex);
-            RevisedAt[injectAt] = DateTime.UtcNow;
+            var injectAt = Interlocked.Increment(ref NextIndex) % RevisedAt.Length;
+            RevisedAt[injectAt] = time;
             return injectAt;
         }
     }
