@@ -66,6 +66,10 @@ namespace CrossBot.Discord
                 items = items.Take(MaxRequestCount).ToArray();
             }
 
+            // Clear wrapping paper
+            foreach (var i in items)
+                i.SetWrapping(0, 0);
+
             var bot = Globals.Bot;
             var fi = bot.FieldItemState;
             var cfg = fi.Config;
