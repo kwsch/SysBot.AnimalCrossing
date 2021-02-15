@@ -67,7 +67,7 @@ namespace CrossBot.Discord
 
             State.Injections.Enqueue(request);
 
-            var msg = $"{mention}: Villager inject request{(request.Items.Count > 1 ? "s have" : "has")} been added to the queue and will be injected momentarily.";
+            var msg = $"{mention}: Villager inject request{(request.Items.Count > 1 ? "s have" : " has")} been added to the queue and will be injected momentarily.";
             await ReplyAsync(msg).ConfigureAwait(false);
         }
 

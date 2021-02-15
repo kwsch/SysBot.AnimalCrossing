@@ -47,6 +47,8 @@ namespace CrossBot.SysBot
                 if (++index > Config.MaxVillagerIndex)
                     index = Config.MinVillagerIndex;
             }
+
+            data.Injected = true;
             data.NotifyFinished();
         }
 
