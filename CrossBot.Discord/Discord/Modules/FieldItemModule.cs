@@ -53,7 +53,7 @@ namespace CrossBot.Discord
                 return;
             }
             var cfg = Globals.Bot.Config;
-            var items = ItemParser.GetItemsFromUserInput(request, cfg.DropConfig);
+            var items = ItemParser.GetItemsFromUserInput(request, cfg.DropConfig, ItemDestination.FieldItemDropped);
             await SpawnItems(items.ToArray()).ConfigureAwait(false);
         }
 
@@ -65,10 +65,6 @@ namespace CrossBot.Discord
                 await ReplyAsync(clamped).ConfigureAwait(false);
                 items = items.Take(MaxRequestCount).ToArray();
             }
-
-            // Clear wrapping paper
-            foreach (var i in items)
-                i.SetWrapping(0, 0);
 
             var bot = Globals.Bot;
             var fi = bot.FieldItemState;
