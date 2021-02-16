@@ -86,7 +86,7 @@ namespace CrossBot.Discord
 
             var column = FieldItemDropper.InjectItemsAsDropped(x, y, items, height);
             var mention = Context.User.Mention;
-            var request = new SpawnRequest(Context.User.Username, Context.User.Id, column)
+            var request = new SpawnRequest(Context.User.Username, Context.User.Id, column, items)
             {
                 OnFinish = success =>
                 {

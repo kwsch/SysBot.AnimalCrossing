@@ -54,8 +54,12 @@ namespace CrossBot.Core
     /// </summary>
     public sealed class SpawnRequest : ItemRequest<FieldItemColumn>
     {
-        public SpawnRequest(string user, ulong userID, IReadOnlyCollection<FieldItemColumn> items) : base(user, userID, items)
+        public IReadOnlyList<Item> RawItems { get; }
+
+        public SpawnRequest(string user, ulong userID, IReadOnlyCollection<FieldItemColumn> columns,
+            IReadOnlyList<Item> items) : base(user, userID, columns)
         {
+            RawItems = items;
         }
     }
 

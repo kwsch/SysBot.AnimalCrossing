@@ -115,7 +115,7 @@ namespace CrossBot.SysBot
                 const uint ofs = Offsets.FieldItemStart;
                 {
                     await InjectDroppedItems(fieldSpawn, ofs, token).ConfigureAwait(false);
-                    Log($"Dropped {fieldSpawn.Items.Count} items for {fieldSpawn.User} ({fieldSpawn.UserID}).");
+                    Log($"Injected {fieldSpawn.Items.Count} tile columns ({fieldSpawn.RawItems.Count} items) for {fieldSpawn.User} ({fieldSpawn.UserID}).");
                     fieldSpawn.Injected = true;
                 }
                 FieldItemState.AfterSpawn(fieldSpawn);
