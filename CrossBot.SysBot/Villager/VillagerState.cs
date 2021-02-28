@@ -26,6 +26,7 @@ namespace CrossBot.SysBot
 
         public async Task InitializeVillagers(CancellationToken token)
         {
+            Executor.Log("Reading all villager slots from RAM. This may take some time depending on the maximum transfer setting.");
             for (int index = 0; index < 10; index++)
             {
                 var vOfs = Offsets.GetVillagerOffset(index);
@@ -33,6 +34,7 @@ namespace CrossBot.SysBot
 
                 var v = await Executor.Connection.ReadBytesAsync(vOfs, Villager2.SIZE, token).ConfigureAwait(false);
                 var h = await Executor.Connection.ReadBytesAsync(hOfs, VillagerHouse.SIZE, token).ConfigureAwait(false);
+                Executor.Log($"Villager {index+1}/10 done.");
                 Existing[index] = new VillagerInfo(new Villager2(v), new VillagerHouse(h));
             }
         }
