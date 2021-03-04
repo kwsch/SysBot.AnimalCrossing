@@ -1,5 +1,6 @@
 ﻿using System;
 using NHSE.Core;
+using CrossBot.Core;
 
 namespace CrossBot.SysBot
 {
@@ -10,6 +11,17 @@ namespace CrossBot.SysBot
     public class DropBotConfig : IConfigItem
     {
         private int _maxDropCount = 7;
+
+        /// <summary>
+        /// Mode to drop items with.
+        /// </summary>
+        public DropMode Mode { get; set; }
+
+        /// <summary>
+        /// When enabled, the bot will skip drop compatibility checks when parsing items for dropping from the player inventory.
+        /// </summary>
+        /// <remarks>If trying to drop irregular items, be sure that <see cref="Mode"/> is set to <see cref="DropMode.SingleDropOptionOverwrite"/></remarks>
+        public bool SkipDropCheck { get; set; }
 
         /// <summary> When enabled, bot picks up items when idle for <see cref="NoActivitySeconds"/> seconds. </summary>
         public bool AutoClean { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CrossBot.Core;
 using NHSE.Core;
@@ -168,20 +169,45 @@ namespace CrossBot.SysBot
             var itemName = GameInfo.Strings.GetItemName(item);
             Log($"Injecting Item: {item.DisplayItemId:X4} ({itemName}).");
 
-            // Inject item.
-            var data = item.ToBytesClass();
-            var poke = SwitchCommand.Poke(Config.InventoryOffset, data, UseCRLF);
-            await Connection.SendAsync(poke, token).ConfigureAwait(false);
-            await Task.Delay(0_300, token).ConfigureAwait(false);
+            if (DropState.Config.Mode == DropMode.Legacy)
+            {
+                // Inject item.
+                var data = item.ToBytesClass();
+                var poke = SwitchCommand.Poke(Config.InventoryOffset, data, UseCRLF);
+                await Connection.SendAsync(poke, token).ConfigureAwait(false);
+                await Task.Delay(0_300, token).ConfigureAwait(false);
 
-            // Open player inventory and open the currently selected item slot -- assumed to be the config offset.
-            await Click(SwitchButton.X, 1_100, token).ConfigureAwait(false);
-            await Click(SwitchButton.A, 0_500, token).ConfigureAwait(false);
+                // Open player inventory and open the currently selected item slot -- assumed to be the config offset.
+                await Click(SwitchButton.X, 1_100, token).ConfigureAwait(false);
+                await Click(SwitchButton.A, 0_500, token).ConfigureAwait(false);
 
-            // Navigate down to the "drop item" option.
-            var downCount = item.GetItemDropOption();
-            for (int i = 0; i < downCount; i++)
-                await Click(SwitchButton.DDOWN, 0_400, token).ConfigureAwait(false);
+                // Navigate down to the "drop item" option.
+                var downCount = item.GetItemDropOption();
+                for (int i = 0; i < downCount; i++)
+                    await Click(SwitchButton.DDOWN, 0_400, token).ConfigureAwait(false);
+            }
+            else if (DropState.Config.Mode == DropMode.SingleDropOptionOverwrite)
+            {
+                // Inject fake item first.
+                var spoof = BitConverter.GetBytes(0x9C9ul); // gold nugget
+                var poke = SwitchCommand.Poke(Config.InventoryOffset, spoof, UseCRLF);
+                await Connection.SendAsync(poke, token).ConfigureAwait(false);
+                await Task.Delay(0_300, token).ConfigureAwait(false);
+
+                // Open player inventory and open the currently selected item slot -- assumed to be the config offset.
+                await Click(SwitchButton.X, 1_100, token).ConfigureAwait(false);
+                await Click(SwitchButton.A, 0_500, token).ConfigureAwait(false);
+
+                // Already at "drop item" option. Inject our actual item.
+                var data = item.ToBytesClass();
+                poke = SwitchCommand.Poke(Config.InventoryOffset, data, UseCRLF);
+                await Connection.SendAsync(poke, token).ConfigureAwait(false);
+                await Task.Delay(0_300, token).ConfigureAwait(false);
+            }
+            else
+            {
+                throw new IndexOutOfRangeException(nameof(DropState.Config.Mode) + " is not a known value.");
+            }
 
             // Drop item, close menu.
             await Click(SwitchButton.A, 0_400, token).ConfigureAwait(false);
