@@ -10,8 +10,8 @@ namespace CrossBot.Core
         // Helpers
         public const uint PlayerSize = 0x10E500;
 
-        public const uint InventoryOffset = 0xAE19C778; // player 0 (A)
-        public const string CoordinatePointer = "[[[[main+39DC030]+18]+178]+D0]+DA";
+        public const uint InventoryOffset = 0xAE61F840; // player 0 (A)
+        public const string CoordinatePointer = "[[[[main+3A08B40]+18]+178]+D0]+DA";
 
         // Main player offsets functions
         public static uint GetPlayerInventoryOffset(uint profiles) => (InventoryOffset + (PlayerSize * (profiles - 1)));
