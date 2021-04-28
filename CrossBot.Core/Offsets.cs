@@ -17,22 +17,22 @@ namespace CrossBot.Core
         public static uint GetPlayerInventoryOffset(uint profiles) => (InventoryOffset + (PlayerSize * (profiles - 1)));
 
         // Main save offsets
-        public const uint TurnipAddress = 0xAD195B74;
-        public const uint VillagerAddress = TurnipAddress - 0x2cb0 - 0x43be1c + 0x10 - 0x90;
-        public const uint VillagerHouseAddress = TurnipAddress - 0x2cb0 - 0x43be1c + 0x43abd4 - 0x90;
+        public const uint TurnipAddress = 0xAD618B84;
+        public const uint VillagerAddress = TurnipAddress - 0x2d40 - 0x43be2c + 0x10 - 0x90;
+        public const uint VillagerHouseAddress = TurnipAddress - 0x2d40 - 0x43be2c + 0x43abd4 - 0x90;
 
         public static uint GetVillagerOffset(int index) => VillagerAddress + (uint)(Villager2.SIZE * index);
         public static uint GetVillagerHouseOffset(int index) => VillagerHouseAddress + (uint)(Villager2.SIZE * index);
 
-        public const uint FieldItemStart = VillagerAddress - 0x10 + 0x22e1a8;
+        public const uint FieldItemStart = VillagerAddress - 0x10 + 0x22e1b8;
 
         // Other Addresses
-        public const uint ArriverNameLocAddress = 0xB6351EA0;
+        public const uint ArriverNameLocAddress = 0xB66D6FF8;
         public const ulong ArriverVillageLocAddress = ArriverNameLocAddress - 0x1C;
-        public const uint TextSpeedAddress = 0xBA88BC8;
-        public const uint DodoAddress = 0xA98D15C;
-        public const uint OnlineSessionAddress = 0x920C740;
-        public const ulong OnlineSessionVisitorAddress = 0x9D3BFB0;
+        public const uint TextSpeedAddress = 0xBACE3B8;
+        public const uint DodoAddress = 0xA98F15C;
+        public const uint OnlineSessionAddress = 0x920E740;
+        public const ulong OnlineSessionVisitorAddress = 0x9F974B8;
         public const ulong OnlineSessionVisitorSize = 0x448; // reverse order
     }
 }
