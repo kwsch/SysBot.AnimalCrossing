@@ -18,8 +18,8 @@ namespace CrossBot.Core
 
         // Main save offsets
         public const uint TurnipAddress = 0xAD618B84;
-        public const uint VillagerAddress = TurnipAddress - 0x2d40 - 0x43be2c + 0x10 - 0x90;
-        public const uint VillagerHouseAddress = TurnipAddress - 0x2d40 - 0x43be2c + 0x43abd4 - 0x90;
+        public const uint VillagerAddress = TurnipAddress - 0x2d40 - 0x43be2c + 0x10;
+        public const uint VillagerHouseAddress = TurnipAddress - 0x2d40 - 0x43be2c + 0x43abe4;
 
         public static uint GetVillagerOffset(int index) => VillagerAddress + (uint)(Villager2.SIZE * index);
         public static uint GetVillagerHouseOffset(int index) => VillagerHouseAddress + (uint)(Villager2.SIZE * index);
