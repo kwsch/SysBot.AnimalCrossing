@@ -21,21 +21,10 @@ namespace CrossBot.Discord
         [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
         public async Task InjectVillagerAsync(string internalName)
         {
-            var bot = Globals.Bot;
-            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
-            {
-                await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
+            if (!await CanInjectVillagers().ConfigureAwait(false))
                 return;
-            }
-            if (!Globals.Bot.Config.VillagerConfig.AllowVillagerInjection)
-            {
-                await ReplyAsync("Villager functionality is currently disabled.").ConfigureAwait(false);
-                return;
-            }
 
-            if (!VillagerResources.IsVillagerDataKnown(internalName))
-                internalName = GameInfo.Strings.VillagerMap.First(z => string.Equals(z.Value, internalName, StringComparison.InvariantCultureIgnoreCase)).Key;
-
+            internalName = SanityCheckVillagerName(internalName);
             if (!Tracker.CanAdd(Config))
             {
                 await ReplyAsync("Cannot add villager at this time; other villagers have been added too recently.").ConfigureAwait(false);
@@ -43,6 +32,48 @@ namespace CrossBot.Discord
             }
 
             int slot = Tracker.Add();
+            await TryInjectVillagerAsync(internalName, slot).ConfigureAwait(false);
+        }
+
+        [RequireSudo]
+        [Command("injectVillager"), Alias("iv")]
+        [Summary("Injects a villager based on the internal name.")]
+        public async Task InjectVillagerAsync(string internalName, int slot)
+        {
+            if (!await CanInjectVillagers().ConfigureAwait(false))
+                return;
+
+            internalName = SanityCheckVillagerName(internalName);
+            await TryInjectVillagerAsync(internalName, slot).ConfigureAwait(false);
+        }
+
+        private async Task<bool> CanInjectVillagers()
+        {
+            var bot = Globals.Bot;
+            if (bot.Config.RequireJoin && bot.Island.GetVisitor(Context.User.Id) == null && !Globals.Self.Config.CanUseSudo(Context.User.Id))
+            {
+                await ReplyAsync($"You must `{IslandModule.cmdJoin}` the island before using this command.").ConfigureAwait(false);
+                return false;
+            }
+
+            if (!Globals.Bot.Config.VillagerConfig.AllowVillagerInjection)
+            {
+                await ReplyAsync("Villager functionality is currently disabled.").ConfigureAwait(false);
+                return false;
+            }
+
+            return true;
+        }
+
+        private static string SanityCheckVillagerName(string internalName)
+        {
+            if (VillagerResources.IsVillagerDataKnown(internalName))
+                return internalName;
+            return GameInfo.Strings.VillagerMap.First(z => string.Equals(z.Value, internalName, StringComparison.InvariantCultureIgnoreCase)).Key;
+        }
+
+        private async Task TryInjectVillagerAsync(string internalName, int slot)
+        {
             var vd = State.Existing[slot + Config.MinVillagerIndex];
             if (vd == null)
             {
