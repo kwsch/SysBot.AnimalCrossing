@@ -33,9 +33,9 @@ namespace CrossBot.SysBot
                 var hOfs = Offsets.GetVillagerHouseOffset(index);
 
                 var v = await Executor.Connection.ReadBytesAsync(vOfs, Villager2.SIZE, token).ConfigureAwait(false);
-                var h = await Executor.Connection.ReadBytesAsync(hOfs, VillagerHouse.SIZE, token).ConfigureAwait(false);
+                var h = await Executor.Connection.ReadBytesAsync(hOfs, VillagerHouse2.SIZE, token).ConfigureAwait(false);
                 Executor.Log($"Villager {index+1}/10 done.");
-                Existing[index] = new VillagerInfo(new Villager2(v), new VillagerHouse(h));
+                Existing[index] = new VillagerInfo(new Villager2(v), new VillagerHouse2(h));
             }
         }
 

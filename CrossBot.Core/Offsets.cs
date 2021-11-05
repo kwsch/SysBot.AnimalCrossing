@@ -22,7 +22,7 @@ namespace CrossBot.Core
         public const uint VillagerHouseAddress = TurnipAddress - 0x2D40 - 0x45B50C + 0x44f7FC;
 
         public static uint GetVillagerOffset(int index) => VillagerAddress + (uint)(Villager2.SIZE * index);
-        public static uint GetVillagerHouseOffset(int index) => VillagerHouseAddress + (uint)(Villager2.SIZE * index);
+        public static uint GetVillagerHouseOffset(int index) => VillagerHouseAddress + (uint)(VillagerHouse2.SIZE * index);
 
         public const uint FieldItemStart = VillagerAddress - 0x10 + 0x22F3F0;
 
