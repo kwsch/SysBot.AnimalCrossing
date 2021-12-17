@@ -10,14 +10,14 @@ namespace CrossBot.Core
         // Helpers
         public const uint PlayerSize = 0x11B968;
 
-        public const uint InventoryOffset = 0xAF70D6E0; // player 0 (A)
-        public const string CoordinatePointer = "[[[[main+460ED68]+18]+178]+D0]+DA";
+        public const uint InventoryOffset = 0xAF71E6E0; // player 0 (A)
+        public const string CoordinatePointer = "[[[[main+4627088]+18]+178]+D0]+DA";
 
         // Main player offsets functions
         public static uint GetPlayerInventoryOffset(uint profiles) => (InventoryOffset + (PlayerSize * (profiles - 1)));
 
         // Main save offsets
-        public const uint TurnipAddress = 0xAE6030F4;
+        public const uint TurnipAddress = 0xAE6140F4;
         public const uint VillagerAddress = TurnipAddress - 0x2D40 - 0x45B50C + 0x10;
         public const uint VillagerHouseAddress = TurnipAddress - 0x2D40 - 0x45B50C + 0x44f7FC;
 
@@ -26,7 +26,7 @@ namespace CrossBot.Core
 
         public const uint FieldItemStart = VillagerAddress - 0x10 + 0x22F3F0;
 
-        public const uint DodoAddress = 0xABCF15C;
-        public const uint OnlineSessionAddress = 0x944E740;
+        public const uint DodoAddress = 0xABE015C;
+        public const uint OnlineSessionAddress = 0x945F740;
     }
 }
