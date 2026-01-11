@@ -1,10 +1,9 @@
-﻿namespace CrossBot.Core
+﻿namespace CrossBot.Core;
+
+public enum DownloadResult
 {
-    public enum DownloadResult
-    {
-        Success,
-        Unsupported,
-        SizeBad,
-        SizeBig,
-    }
+    Success,
+    Unsupported,
+    SizeBad,
+    SizeBig,
 }

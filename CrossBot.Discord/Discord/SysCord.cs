@@ -10,243 +10,242 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using SysBot.Base;
 
-namespace CrossBot.Discord
+namespace CrossBot.Discord;
+
+/// <summary>
+/// Discord Bot that monitors the <see cref="Bot"/> state and updates its status accordingly.
+/// </summary>
+public sealed class SysCord
 {
-    /// <summary>
-    /// Discord Bot that monitors the <see cref="Bot"/> state and updates its status accordingly.
-    /// </summary>
-    public sealed class SysCord
+    private readonly DiscordSocketClient _client;
+    private readonly Bot Bot;
+    public readonly DiscordBotConfig Config;
+    public ulong Owner = ulong.MaxValue;
+
+    // Keep the CommandService and DI container around for use with commands.
+    // These two types require you install the Discord.Net.Commands package.
+    private readonly CommandService _commands;
+    private readonly IServiceProvider _services;
+
+    public SysCord(Bot bot, DiscordBotConfig cfg)
     {
-        private readonly DiscordSocketClient _client;
-        private readonly Bot Bot;
-        public readonly DiscordBotConfig Config;
-        public ulong Owner = ulong.MaxValue;
-
-        // Keep the CommandService and DI container around for use with commands.
-        // These two types require you install the Discord.Net.Commands package.
-        private readonly CommandService _commands;
-        private readonly IServiceProvider _services;
-
-        public SysCord(Bot bot, DiscordBotConfig cfg)
+        Bot = bot;
+        Config = cfg;
+        Globals.Self = this;
+        Globals.Bot = bot;
+        _client = new DiscordSocketClient(new DiscordSocketConfig
         {
-            Bot = bot;
-            Config = cfg;
-            Globals.Self = this;
-            Globals.Bot = bot;
-            _client = new DiscordSocketClient(new DiscordSocketConfig
-            {
-                // How much logging do you want to see?
-                LogLevel = LogSeverity.Info,
+            // How much logging do you want to see?
+            LogLevel = LogSeverity.Info,
 
-                // If you or another service needs to do anything with messages
-                // (e.g. checking Reactions, checking the content of edited/deleted messages),
-                // you must set the MessageCacheSize. You may adjust the number as needed.
-                //MessageCacheSize = 50,
-            });
+            // If you or another service needs to do anything with messages
+            // (e.g. checking Reactions, checking the content of edited/deleted messages),
+            // you must set the MessageCacheSize. You may adjust the number as needed.
+            //MessageCacheSize = 50,
+        });
 
-            _commands = new CommandService(new CommandServiceConfig
-            {
-                // Again, log level:
-                LogLevel = LogSeverity.Info,
+        _commands = new CommandService(new CommandServiceConfig
+        {
+            // Again, log level:
+            LogLevel = LogSeverity.Info,
 
-                // This makes commands get run on the task thread pool instead on the websocket read thread.
-                // This ensures long-running logic can't block the websocket connection.
-                DefaultRunMode = RunMode.Sync,
+            // This makes commands get run on the task thread pool instead on the websocket read thread.
+            // This ensures long-running logic can't block the websocket connection.
+            DefaultRunMode = RunMode.Sync,
 
-                // There's a few more properties you can set,
-                // for example, case-insensitive commands.
-                CaseSensitiveCommands = false,
-            });
+            // There's a few more properties you can set,
+            // for example, case-insensitive commands.
+            CaseSensitiveCommands = false,
+        });
 
-            // Subscribe the logging handler to both the client and the CommandService.
-            _client.Log += Log;
-            _commands.Log += Log;
+        // Subscribe the logging handler to both the client and the CommandService.
+        _client.Log += Log;
+        _commands.Log += Log;
 
-            // Setup your DI container.
-            _services = ConfigureServices();
+        // Setup your DI container.
+        _services = ConfigureServices();
+    }
+
+    // If any services require the client, or the CommandService, or something else you keep on hand,
+    // pass them as parameters into this method as needed.
+    // If this method is getting pretty long, you can separate it out into another file using partials.
+    private static ServiceProvider ConfigureServices()
+    {
+        var map = new ServiceCollection();//.AddSingleton(new SomeServiceClass());
+
+        // When all your required services are in the collection, build the container.
+        // Tip: There's an overload taking in a 'validateScopes' bool to make sure
+        // you haven't made any mistakes in your dependency graph.
+        return map.BuildServiceProvider();
+    }
+
+    // Example of a logging handler. This can be re-used by addons
+    // that ask for a Func<LogMessage, Task>.
+
+    private static Task Log(LogMessage msg)
+    {
+        Console.ForegroundColor = msg.Severity switch
+        {
+            LogSeverity.Critical => ConsoleColor.Red,
+            LogSeverity.Error => ConsoleColor.Red,
+
+            LogSeverity.Warning => ConsoleColor.Yellow,
+            LogSeverity.Info => ConsoleColor.White,
+
+            LogSeverity.Verbose => ConsoleColor.DarkGray,
+            LogSeverity.Debug => ConsoleColor.DarkGray,
+            _ => Console.ForegroundColor
+        };
+
+        var text = $"[{msg.Severity,8}] {msg.Source}: {msg.Message} {msg.Exception}";
+        Console.WriteLine($"{DateTime.Now,-19} {text}");
+        Console.ResetColor();
+
+        LogUtil.LogText($"SysCord: {text}");
+
+        return Task.CompletedTask;
+    }
+
+    public async Task MainAsync(string apiToken, DiscordBotConfig cfg, CancellationToken token)
+    {
+        // Centralize the logic for commands into a separate method.
+        await InitCommands(cfg).ConfigureAwait(false);
+
+        // Login and connect.
+        await _client.LoginAsync(TokenType.Bot, apiToken).ConfigureAwait(false);
+        await _client.StartAsync().ConfigureAwait(false);
+
+        await Task.Delay(5_000, token).ConfigureAwait(false);
+
+        var game = Config.Name;
+        if (!string.IsNullOrWhiteSpace(game))
+            await _client.SetGameAsync(game).ConfigureAwait(false);
+
+        var app = await _client.GetApplicationInfoAsync().ConfigureAwait(false);
+        Owner = app.Owner.Id;
+
+        // Wait infinitely so your bot actually stays connected.
+        await MonitorStatusAsync(token).ConfigureAwait(false);
+    }
+
+    public async Task InitCommands(DiscordBotConfig cfg)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        await _commands.AddModulesAsync(assembly, _services).ConfigureAwait(false);
+        var modules = _commands.Modules.ToList();
+
+        var blacklist = cfg.ModuleBlacklist
+            .Replace("Module", "").Split([','], StringSplitOptions.RemoveEmptyEntries)
+            .Select(z => z.Trim()).ToList();
+
+        foreach (var module in modules)
+        {
+            var name = module.Name.Replace("Module", "");
+            if (blacklist.Any(z => z.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                await _commands.RemoveModuleAsync(module).ConfigureAwait(false);
         }
 
-        // If any services require the client, or the CommandService, or something else you keep on hand,
-        // pass them as parameters into this method as needed.
-        // If this method is getting pretty long, you can separate it out into another file using partials.
-        private static ServiceProvider ConfigureServices()
+        // Subscribe a handler to see if a message invokes a command.
+        _client.MessageReceived += HandleMessageAsync;
+    }
+
+    private async Task HandleMessageAsync(SocketMessage arg)
+    {
+        // Bail out if it's a System Message.
+        if (arg is not SocketUserMessage msg)
+            return;
+
+        // We don't want the bot to respond to itself or other bots.
+        if (msg.Author.Id == _client.CurrentUser.Id || msg.Author.IsBot)
+            return;
+
+        // Create a number to track where the prefix ends and the command begins
+        int pos = 0;
+        if (msg.HasStringPrefix(Config.Prefix, ref pos))
         {
-            var map = new ServiceCollection();//.AddSingleton(new SomeServiceClass());
-
-            // When all your required services are in the collection, build the container.
-            // Tip: There's an overload taking in a 'validateScopes' bool to make sure
-            // you haven't made any mistakes in your dependency graph.
-            return map.BuildServiceProvider();
-        }
-
-        // Example of a logging handler. This can be re-used by addons
-        // that ask for a Func<LogMessage, Task>.
-
-        private static Task Log(LogMessage msg)
-        {
-            Console.ForegroundColor = msg.Severity switch
-            {
-                LogSeverity.Critical => ConsoleColor.Red,
-                LogSeverity.Error => ConsoleColor.Red,
-
-                LogSeverity.Warning => ConsoleColor.Yellow,
-                LogSeverity.Info => ConsoleColor.White,
-
-                LogSeverity.Verbose => ConsoleColor.DarkGray,
-                LogSeverity.Debug => ConsoleColor.DarkGray,
-                _ => Console.ForegroundColor
-            };
-
-            var text = $"[{msg.Severity,8}] {msg.Source}: {msg.Message} {msg.Exception}";
-            Console.WriteLine($"{DateTime.Now,-19} {text}");
-            Console.ResetColor();
-
-            LogUtil.LogText($"SysCord: {text}");
-
-            return Task.CompletedTask;
-        }
-
-        public async Task MainAsync(string apiToken, DiscordBotConfig cfg, CancellationToken token)
-        {
-            // Centralize the logic for commands into a separate method.
-            await InitCommands(cfg).ConfigureAwait(false);
-
-            // Login and connect.
-            await _client.LoginAsync(TokenType.Bot, apiToken).ConfigureAwait(false);
-            await _client.StartAsync().ConfigureAwait(false);
-
-            await Task.Delay(5_000, token).ConfigureAwait(false);
-
-            var game = Config.Name;
-            if (!string.IsNullOrWhiteSpace(game))
-                await _client.SetGameAsync(game).ConfigureAwait(false);
-
-            var app = await _client.GetApplicationInfoAsync().ConfigureAwait(false);
-            Owner = app.Owner.Id;
-
-            // Wait infinitely so your bot actually stays connected.
-            await MonitorStatusAsync(token).ConfigureAwait(false);
-        }
-
-        public async Task InitCommands(DiscordBotConfig cfg)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            await _commands.AddModulesAsync(assembly, _services).ConfigureAwait(false);
-            var modules = _commands.Modules.ToList();
-
-            var blacklist = cfg.ModuleBlacklist
-                .Replace("Module", "").Split([','], StringSplitOptions.RemoveEmptyEntries)
-                .Select(z => z.Trim()).ToList();
-
-            foreach (var module in modules)
-            {
-                var name = module.Name.Replace("Module", "");
-                if (blacklist.Any(z => z.Equals(name, StringComparison.OrdinalIgnoreCase)))
-                    await _commands.RemoveModuleAsync(module).ConfigureAwait(false);
-            }
-
-            // Subscribe a handler to see if a message invokes a command.
-            _client.MessageReceived += HandleMessageAsync;
-        }
-
-        private async Task HandleMessageAsync(SocketMessage arg)
-        {
-            // Bail out if it's a System Message.
-            if (arg is not SocketUserMessage msg)
+            bool handled = await TryHandleCommandAsync(msg, pos).ConfigureAwait(false);
+            if (handled)
                 return;
-
-            // We don't want the bot to respond to itself or other bots.
-            if (msg.Author.Id == _client.CurrentUser.Id || msg.Author.IsBot)
-                return;
-
-            // Create a number to track where the prefix ends and the command begins
-            int pos = 0;
-            if (msg.HasStringPrefix(Config.Prefix, ref pos))
-            {
-                bool handled = await TryHandleCommandAsync(msg, pos).ConfigureAwait(false);
-                if (handled)
-                    return;
-            }
-
-            await TryHandleMessageAsync(msg).ConfigureAwait(false);
         }
 
-        private static async Task TryHandleMessageAsync(SocketMessage msg)
+        await TryHandleMessageAsync(msg).ConfigureAwait(false);
+    }
+
+    private static async Task TryHandleMessageAsync(SocketMessage msg)
+    {
+        // should this be a service?
+        if (msg.Attachments.Count > 0)
         {
-            // should this be a service?
-            if (msg.Attachments.Count > 0)
-            {
-                await Task.CompletedTask.ConfigureAwait(false);
-            }
+            await Task.CompletedTask.ConfigureAwait(false);
         }
+    }
 
-        private async Task<bool> TryHandleCommandAsync(SocketUserMessage msg, int pos)
+    private async Task<bool> TryHandleCommandAsync(SocketUserMessage msg, int pos)
+    {
+        // Create a Command Context.
+        var context = new SocketCommandContext(_client, msg);
+
+        // Check Permission
+        var mgr = Config;
+        if (!mgr.CanUseCommandUser(msg.Author.Id))
         {
-            // Create a Command Context.
-            var context = new SocketCommandContext(_client, msg);
-
-            // Check Permission
-            var mgr = Config;
-            if (!mgr.CanUseCommandUser(msg.Author.Id))
-            {
-                await msg.Channel.SendMessageAsync("You are not permitted to use this command.").ConfigureAwait(false);
-                return true;
-            }
-            if (!mgr.CanUseCommandChannel(msg.Channel.Id) && msg.Author.Id != Owner)
-            {
-                await msg.Channel.SendMessageAsync("You can't use that command here.").ConfigureAwait(false);
-                return true;
-            }
-
-            // Execute the command. (result does not indicate a return value, 
-            // rather an object stating if the command executed successfully).
-            var guild = msg.Channel is SocketGuildChannel g ? g.Guild.Name : "Unknown Guild";
-            await Log(new LogMessage(LogSeverity.Info, "Command", $"Executing command from {guild}#{msg.Channel.Name}:@{msg.Author.Username}. Content: {msg}")).ConfigureAwait(false);
-            var result = await _commands.ExecuteAsync(context, pos, _services).ConfigureAwait(false);
-
-            if (result.Error == CommandError.UnknownCommand)
-                return false;
-
-            // Uncomment the following lines if you want the bot
-            // to send a message if it failed.
-            // This does not catch errors from commands with 'RunMode.Async',
-            // subscribe a handler for '_commands.CommandExecuted' to see those.
-            if (!result.IsSuccess)
-                await msg.Channel.SendMessageAsync(result.ErrorReason).ConfigureAwait(false);
+            await msg.Channel.SendMessageAsync("You are not permitted to use this command.").ConfigureAwait(false);
+            return true;
+        }
+        if (!mgr.CanUseCommandChannel(msg.Channel.Id) && msg.Author.Id != Owner)
+        {
+            await msg.Channel.SendMessageAsync("You can't use that command here.").ConfigureAwait(false);
             return true;
         }
 
-        private async Task MonitorStatusAsync(CancellationToken token)
+        // Execute the command. (result does not indicate a return value, 
+        // rather an object stating if the command executed successfully).
+        var guild = msg.Channel is SocketGuildChannel g ? g.Guild.Name : "Unknown Guild";
+        await Log(new LogMessage(LogSeverity.Info, "Command", $"Executing command from {guild}#{msg.Channel.Name}:@{msg.Author.Username}. Content: {msg}")).ConfigureAwait(false);
+        var result = await _commands.ExecuteAsync(context, pos, _services).ConfigureAwait(false);
+
+        if (result.Error == CommandError.UnknownCommand)
+            return false;
+
+        // Uncomment the following lines if you want the bot
+        // to send a message if it failed.
+        // This does not catch errors from commands with 'RunMode.Async',
+        // subscribe a handler for '_commands.CommandExecuted' to see those.
+        if (!result.IsSuccess)
+            await msg.Channel.SendMessageAsync(result.ErrorReason).ConfigureAwait(false);
+        return true;
+    }
+
+    private async Task MonitorStatusAsync(CancellationToken token)
+    {
+        var state = UserStatus.Idle;
+        var code = string.Empty;
+        while (!token.IsCancellationRequested)
         {
-            var state = UserStatus.Idle;
-            var code = string.Empty;
-            while (!token.IsCancellationRequested)
-            {
-                var update = CheckState(out var millisecondsDelay);
-                if (state != update)
-                    await _client.SetStatusAsync(state = update).ConfigureAwait(false);
+            var update = CheckState(out var millisecondsDelay);
+            if (state != update)
+                await _client.SetStatusAsync(state = update).ConfigureAwait(false);
 
-                if (Config.SetStatusAsDodoCode && code != Bot.Island.DodoCode)
-                    await _client.SetGameAsync($"{Config.Name}: {code = Bot.Island.DodoCode}").ConfigureAwait(false);
+            if (Config.SetStatusAsDodoCode && code != Bot.Island.DodoCode)
+                await _client.SetGameAsync($"{Config.Name}: {code = Bot.Island.DodoCode}").ConfigureAwait(false);
 
-                await Task.Delay(millisecondsDelay, token).ConfigureAwait(false);
-            }
+            await Task.Delay(millisecondsDelay, token).ConfigureAwait(false);
         }
+    }
 
-        private UserStatus CheckState(out int delay)
-        {
-            delay = 2_000;
-            if (!Bot.Config.AcceptingCommands)
-                return UserStatus.DoNotDisturb;
+    private UserStatus CheckState(out int delay)
+    {
+        delay = 2_000;
+        if (!Bot.Config.AcceptingCommands)
+            return UserStatus.DoNotDisturb;
 
-            // Check datetime for update; if logged anything in past 20 seconds, we're active.
-            const int Interval = 20_000;
-            var delta = DateTime.Now - LogUtil.LastLogged;
-            var gap = TimeSpan.FromMinutes(Interval) - delta;
+        // Check datetime for update; if logged anything in past 20 seconds, we're active.
+        const int Interval = 20_000;
+        var delta = DateTime.Now - LogUtil.LastLogged;
+        var gap = TimeSpan.FromMinutes(Interval) - delta;
 
-            delay = Math.Max(delay, gap.Milliseconds);
-            return gap > TimeSpan.Zero ? UserStatus.Online : UserStatus.Idle;
-        }
+        delay = Math.Max(delay, gap.Milliseconds);
+        return gap > TimeSpan.Zero ? UserStatus.Online : UserStatus.Idle;
     }
 }

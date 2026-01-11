@@ -2,143 +2,142 @@
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace CrossBot.Discord
+namespace CrossBot.Discord;
+
+// ReSharper disable once UnusedType.Global
+public class IslandModule : ModuleBase<SocketCommandContext>
 {
-    // ReSharper disable once UnusedType.Global
-    public class IslandModule : ModuleBase<SocketCommandContext>
+    public const string cmdJoin = "join";
+    private const string cmdLeave = "leave";
+
+    [Command("code")] [Alias("dodo", "dc")]
+    [Summary("Prints the Dodo Code for the island.")]
+    [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+    public async Task RequestDodoCodeAsync()
     {
-        public const string cmdJoin = "join";
-        private const string cmdLeave = "leave";
+        await ReplyAsync($"Dodo Code: {Globals.Bot.Island.DodoCode}.").ConfigureAwait(false);
+    }
 
-        [Command("code")] [Alias("dodo", "dc")]
-        [Summary("Prints the Dodo Code for the island.")]
-        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
-        public async Task RequestDodoCodeAsync()
-        {
-            await ReplyAsync($"Dodo Code: {Globals.Bot.Island.DodoCode}.").ConfigureAwait(false);
-        }
+    [Command("visitorCount")] [Alias("count", "cv", "vc")]
+    [Summary("Prints the amount of visitors on the island.")]
+    [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+    public async Task RequestVisitorCountAsync()
+    {
+        await ReplyAsync($"Visitor count: {Globals.Bot.Island.Count}.").ConfigureAwait(false);
+    }
 
-        [Command("visitorCount")] [Alias("count", "cv", "vc")]
-        [Summary("Prints the amount of visitors on the island.")]
-        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
-        public async Task RequestVisitorCountAsync()
-        {
-            await ReplyAsync($"Visitor count: {Globals.Bot.Island.Count}.").ConfigureAwait(false);
-        }
+    [Command("visitorList")] [Alias("listVisitors", "lv", "vl")]
+    [Summary("Prints the amount of visitors on the island.")]
+    [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+    public async Task RequestVisitorListAsync()
+    {
+        var visitors = Globals.Bot.Island.GetCurrentVisitors().Select(z => z.ToString());
+        await ReplyAsync($"Visitor list:\r\n{string.Join("\r\n", visitors)}").ConfigureAwait(false);
+    }
 
-        [Command("visitorList")] [Alias("listVisitors", "lv", "vl")]
-        [Summary("Prints the amount of visitors on the island.")]
-        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
-        public async Task RequestVisitorListAsync()
+    [Command(cmdJoin)] [Alias("j")]
+    [Summary("Indicates the user is joining the island.")]
+    [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+    public async Task JoinIslandAsync()
+    {
+        var user = Context.User;
+        if (Context.Message.MentionedUsers.Count > 0 && Globals.Self.Config.CanUseSudo(user.Id))
         {
-            var visitors = Globals.Bot.Island.GetCurrentVisitors().Select(z => z.ToString());
-            await ReplyAsync($"Visitor list:\r\n{string.Join("\r\n", visitors)}").ConfigureAwait(false);
-        }
-
-        [Command(cmdJoin)] [Alias("j")]
-        [Summary("Indicates the user is joining the island.")]
-        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
-        public async Task JoinIslandAsync()
-        {
-            var user = Context.User;
-            if (Context.Message.MentionedUsers.Count > 0 && Globals.Self.Config.CanUseSudo(user.Id))
+            if (Context.Message.MentionedUsers.Count > 1)
             {
-                if (Context.Message.MentionedUsers.Count > 1)
-                {
-                    await ReplyAsync("Too many mentions. One user at a time please.").ConfigureAwait(false);
-                    return;
-                }
-                user = Context.Message.MentionedUsers.ElementAt(0);
-            }
-
-            var cfg = Globals.Bot.Config;
-            var island = Globals.Bot.Island;
-            if (cfg.RequireJoin && island.Count >= cfg.MaxVisitorCount && !Globals.Self.Config.CanUseSudo(user.Id))
-            {
-                await ReplyAsync($"Too many people are already on the island (max {cfg.MaxVisitorCount}). Please wait until someone leaves.").ConfigureAwait(false);
+                await ReplyAsync("Too many mentions. One user at a time please.").ConfigureAwait(false);
                 return;
             }
-
-            var result = island.Arrive(user.Username, user.Id);
-            if (!result)
-            {
-                var detail = island.GetVisitor(user.Id);
-                if (detail == null)
-                    await ReplyAsync("Stop being sneaky.").ConfigureAwait(false);
-                else
-                    await ReplyAsync($"You have already joined the island -- at {detail.JoinTime:T} ({detail.Duration:g} ago).").ConfigureAwait(false);
-                return;
-            }
-
-            await ReplyAsync($"{user.Username} has joined the island.\r\nWhen you are leaving please use the `{cmdLeave}` command.\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
+            user = Context.Message.MentionedUsers.ElementAt(0);
         }
 
-        [Command("leave")] [Alias("l")]
-        [Summary("Indicates the user is leaving the island.")]
-        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
-        public async Task LeaveIslandAsync()
+        var cfg = Globals.Bot.Config;
+        var island = Globals.Bot.Island;
+        if (cfg.RequireJoin && island.Count >= cfg.MaxVisitorCount && !Globals.Self.Config.CanUseSudo(user.Id))
         {
-            var user = Context.User;
-            if (Context.Message.MentionedUsers.Count > 0 && Globals.Self.Config.CanUseSudo(user.Id))
-            {
-                if (Context.Message.MentionedUsers.Count > 1)
-                {
-                    await ReplyAsync("Too many mentions. One user at a time please.").ConfigureAwait(false);
-                    return;
-                }
-                user = Context.Message.MentionedUsers.ElementAt(0);
-            }
-            var island = Globals.Bot.Island;
-            var result = island.Depart(user.Id);
-            if (result == null)
-            {
-                await ReplyAsync($"You must first be on the island via `{cmdJoin}`.").ConfigureAwait(false);
-                return;
-            }
-
-            await ReplyAsync($"{user.Username} has left the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
+            await ReplyAsync($"Too many people are already on the island (max {cfg.MaxVisitorCount}). Please wait until someone leaves.").ConfigureAwait(false);
+            return;
         }
 
-        [Command("leave")] [Alias("l")]
-        [Summary("Indicates the user is leaving the island.")]
-        [RequireSudo]
-        public async Task LeaveIslandAsync(ulong uid)
+        var result = island.Arrive(user.Username, user.Id);
+        if (!result)
         {
-            var island = Globals.Bot.Island;
-            var result = island.Depart(uid);
-            if (result == null)
-            {
-                await ReplyAsync("Not present on island.").ConfigureAwait(false);
-                return;
-            }
-
-            await ReplyAsync($"{result.Name} has left the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
-        }
-
-        [Command("time")] [Alias("vt", "visitTime", "timeVisit", "duration")]
-        [Summary("Prints the amount of time that a joined user has been on the island in their current visit session.")]
-        [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
-        public async Task PrintVisitTimeAsync()
-        {
-            var user = Context.User;
-            if (Context.Message.MentionedUsers.Count > 0 && Globals.Self.Config.CanUseSudo(user.Id))
-            {
-                if (Context.Message.MentionedUsers.Count > 1)
-                {
-                    await ReplyAsync("Too many mentions. One user at a time please.").ConfigureAwait(false);
-                    return;
-                }
-                user = Context.Message.MentionedUsers.ElementAt(0);
-            }
-            var island = Globals.Bot.Island;
             var detail = island.GetVisitor(user.Id);
             if (detail == null)
+                await ReplyAsync("Stop being sneaky.").ConfigureAwait(false);
+            else
+                await ReplyAsync($"You have already joined the island -- at {detail.JoinTime:T} ({detail.Duration:g} ago).").ConfigureAwait(false);
+            return;
+        }
+
+        await ReplyAsync($"{user.Username} has joined the island.\r\nWhen you are leaving please use the `{cmdLeave}` command.\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
+    }
+
+    [Command("leave")] [Alias("l")]
+    [Summary("Indicates the user is leaving the island.")]
+    [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+    public async Task LeaveIslandAsync()
+    {
+        var user = Context.User;
+        if (Context.Message.MentionedUsers.Count > 0 && Globals.Self.Config.CanUseSudo(user.Id))
+        {
+            if (Context.Message.MentionedUsers.Count > 1)
             {
-                await ReplyAsync($"Requested user is not currently on the island. They must join via `{cmdJoin}` prior to having a visit duration.").ConfigureAwait(false);
+                await ReplyAsync("Too many mentions. One user at a time please.").ConfigureAwait(false);
                 return;
             }
-
-            await ReplyAsync($"{user.Username} has been on the island since {detail.JoinTime:T} ({detail.Duration:g} ago).").ConfigureAwait(false);
+            user = Context.Message.MentionedUsers.ElementAt(0);
         }
+        var island = Globals.Bot.Island;
+        var result = island.Depart(user.Id);
+        if (result == null)
+        {
+            await ReplyAsync($"You must first be on the island via `{cmdJoin}`.").ConfigureAwait(false);
+            return;
+        }
+
+        await ReplyAsync($"{user.Username} has left the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
+    }
+
+    [Command("leave")] [Alias("l")]
+    [Summary("Indicates the user is leaving the island.")]
+    [RequireSudo]
+    public async Task LeaveIslandAsync(ulong uid)
+    {
+        var island = Globals.Bot.Island;
+        var result = island.Depart(uid);
+        if (result == null)
+        {
+            await ReplyAsync("Not present on island.").ConfigureAwait(false);
+            return;
+        }
+
+        await ReplyAsync($"{result.Name} has left the island.\r\nVisit time: {result.Duration:g}\r\nCurrent visitor count: {island.Count}.").ConfigureAwait(false);
+    }
+
+    [Command("time")] [Alias("vt", "visitTime", "timeVisit", "duration")]
+    [Summary("Prints the amount of time that a joined user has been on the island in their current visit session.")]
+    [RequireQueueRole(nameof(Globals.Self.Config.RoleUseBot))]
+    public async Task PrintVisitTimeAsync()
+    {
+        var user = Context.User;
+        if (Context.Message.MentionedUsers.Count > 0 && Globals.Self.Config.CanUseSudo(user.Id))
+        {
+            if (Context.Message.MentionedUsers.Count > 1)
+            {
+                await ReplyAsync("Too many mentions. One user at a time please.").ConfigureAwait(false);
+                return;
+            }
+            user = Context.Message.MentionedUsers.ElementAt(0);
+        }
+        var island = Globals.Bot.Island;
+        var detail = island.GetVisitor(user.Id);
+        if (detail == null)
+        {
+            await ReplyAsync($"Requested user is not currently on the island. They must join via `{cmdJoin}` prior to having a visit duration.").ConfigureAwait(false);
+            return;
+        }
+
+        await ReplyAsync($"{user.Username} has been on the island since {detail.JoinTime:T} ({detail.Duration:g} ago).").ConfigureAwait(false);
     }
 }

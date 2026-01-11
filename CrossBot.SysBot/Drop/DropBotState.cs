@@ -1,41 +1,40 @@
 ﻿using System.Collections.Concurrent;
 using CrossBot.Core;
 
-namespace CrossBot.SysBot
+namespace CrossBot.SysBot;
+
+/// <summary>
+/// Tracks the state of the Drop Bot
+/// </summary>
+public class DropBotState(DropBotConfig cfg)
 {
-    /// <summary>
-    /// Tracks the state of the Drop Bot
-    /// </summary>
-    public class DropBotState(DropBotConfig cfg)
+    public readonly ConcurrentQueue<DropRequest> Injections = new();
+
+    public readonly DropBotConfig Config = cfg;
+    private int DropCount;
+    private int IdleCount;
+
+    public bool CleanRequested;
+    public bool ValidateRequested;
+
+    public bool CleanRequired => DropCount != 0 && IdleCount > Config.NoActivitySeconds;
+
+    public void AfterDrop(DropRequest dropRequest, int count)
     {
-        public readonly ConcurrentQueue<DropRequest> Injections = new();
+        dropRequest.NotifyFinished();
+        DropCount += count;
+        IdleCount = 0;
+    }
 
-        public readonly DropBotConfig Config = cfg;
-        private int DropCount;
-        private int IdleCount;
+    public void AfterClean()
+    {
+        DropCount = 0;
+        IdleCount = 0;
+        CleanRequested = false;
+    }
 
-        public bool CleanRequested;
-        public bool ValidateRequested;
-
-        public bool CleanRequired => DropCount != 0 && IdleCount > Config.NoActivitySeconds;
-
-        public void AfterDrop(DropRequest dropRequest, int count)
-        {
-            dropRequest.NotifyFinished();
-            DropCount += count;
-            IdleCount = 0;
-        }
-
-        public void AfterClean()
-        {
-            DropCount = 0;
-            IdleCount = 0;
-            CleanRequested = false;
-        }
-
-        public void StillIdle()
-        {
-            IdleCount++;
-        }
+    public void StillIdle()
+    {
+        IdleCount++;
     }
 }

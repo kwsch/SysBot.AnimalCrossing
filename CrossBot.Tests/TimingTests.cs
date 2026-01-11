@@ -3,47 +3,46 @@ using CrossBot.Core;
 using FluentAssertions;
 using Xunit;
 
-namespace CrossBot.Tests
+namespace CrossBot.Tests;
+
+public class TimingTests
 {
-    public class TimingTests
+    private class FakeTimeSettings : ISlotSetting
     {
-        private class FakeTimeSettings : ISlotSetting
+        public int StaleSeconds { get; init; } = 100;
+    }
+
+    [Theory]
+    [InlineData(10, 10, 100)]
+    [InlineData(10, 100, 30)]
+    public void InjectSlots(int capacity, int count, int stale)
+    {
+        var tracker = new SlotTracker(capacity);
+        var settings = new FakeTimeSettings {StaleSeconds = stale};
+        var time = DateTime.UtcNow;
+        for (int i = 1; i <= Math.Min(capacity, count); i++)
         {
-            public int StaleSeconds { get; init; } = 100;
+            tracker.CanAdd(settings, time).Should().BeTrue();
+            tracker.Add(time);
         }
 
-        [Theory]
-        [InlineData(10, 10, 100)]
-        [InlineData(10, 100, 30)]
-        public void InjectSlots(int capacity, int count, int stale)
+        count -= capacity;
+
+        while (count > 0)
         {
-            var tracker = new SlotTracker(capacity);
-            var settings = new FakeTimeSettings {StaleSeconds = stale};
-            var time = DateTime.UtcNow;
-            for (int i = 1; i <= Math.Min(capacity, count); i++)
+            var amount = Math.Min(capacity, count);
+            for (int i = 1; i <= amount; i++)
+            {
+                tracker.CanAdd(settings, time).Should().BeFalse();
+            }
+
+            time = time.AddSeconds(stale + 1);
+            for (int i = 1; i <= amount; i++)
             {
                 tracker.CanAdd(settings, time).Should().BeTrue();
                 tracker.Add(time);
             }
-
             count -= capacity;
-
-            while (count > 0)
-            {
-                var amount = Math.Min(capacity, count);
-                for (int i = 1; i <= amount; i++)
-                {
-                    tracker.CanAdd(settings, time).Should().BeFalse();
-                }
-
-                time = time.AddSeconds(stale + 1);
-                for (int i = 1; i <= amount; i++)
-                {
-                    tracker.CanAdd(settings, time).Should().BeTrue();
-                    tracker.Add(time);
-                }
-                count -= capacity;
-            }
         }
     }
 }
