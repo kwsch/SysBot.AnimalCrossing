@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="CrossBot.ConsoleApp/CrossBot.ConsoleApp.csproj" />
+  <Project Path="CrossBot.Core/CrossBot.Core.csproj" />
+  <Project Path="CrossBot.Discord/CrossBot.Discord.csproj" />
+  <Project Path="CrossBot.SysBot/CrossBot.SysBot.csproj" />
+  <Project Path="CrossBot.Tests/CrossBot.Tests.csproj" />
+</Solution>

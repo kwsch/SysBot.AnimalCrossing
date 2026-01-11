@@ -8,17 +8,12 @@ namespace CrossBot.Core
     /// <summary>
     /// Contains details about an item request.
     /// </summary>
-    public abstract class ItemRequest<T>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="User">User who requested the item.</param>
+    /// <param name="UserID">User ID for the <see cref="User"/></param>
+    /// <param name="Items">List of payloads that need to be injected.</param>
+    public abstract record ItemRequest<T>(string User, ulong UserID, IReadOnlyCollection<T> Items)
     {
-        /// <summary> User who requested the item. </summary>
-        public readonly string User;
-
-        /// <summary> User ID for the <see cref="User"/>. </summary>
-        public readonly ulong UserID;
-
-        /// <summary> List of payloads that need to be injected. </summary>
-        public readonly IReadOnlyCollection<T> Items;
-
         /// <summary>
         /// Indicates if all of the <see cref="Items"/> have been injected.
         /// </summary>
@@ -29,46 +24,27 @@ namespace CrossBot.Core
         /// </summary>
         public Action<bool>? OnFinish { private get; set; }
 
-        protected ItemRequest(string user, ulong userID, IReadOnlyCollection<T> items)
-        {
-            User = user;
-            UserID = userID;
-            Items = items;
-        }
-
         public void NotifyFinished() => OnFinish?.Invoke(Injected);
     }
 
     /// <summary>
     /// Contains details about a drop request.
     /// </summary>
-    public sealed class DropRequest : ItemRequest<Item>
-    {
-        public DropRequest(string user, ulong userID, IReadOnlyCollection<Item> items) : base(user, userID, items)
-        {
-        }
-    }
+    public sealed record DropRequest(string User, ulong UserID, IReadOnlyCollection<Item> Items)
+        : ItemRequest<Item>(User, UserID, Items);
 
     /// <summary>
     /// Contains details about a field item spawn request.
     /// </summary>
-    public sealed class SpawnRequest : ItemRequest<FieldItemColumn>
-    {
-        public IReadOnlyList<Item> RawItems { get; }
-
-        public SpawnRequest(string user, ulong userID, IReadOnlyCollection<FieldItemColumn> columns,
-            IReadOnlyList<Item> items) : base(user, userID, columns)
-        {
-            RawItems = items;
-        }
-    }
+    public sealed record SpawnRequest(string User, ulong UserID, IReadOnlyCollection<FieldItemColumn> Columns, IReadOnlyList<Item> RawItems)
+        : ItemRequest<FieldItemColumn>(User, UserID, Columns);
 
     /// <summary>
     /// Contains details about a villager request.
     /// </summary>
-    public class VillagerRequest : ItemRequest<VillagerData>
+    public sealed record VillagerRequest : ItemRequest<VillagerData>
     {
-        public VillagerRequest(string user, ulong userID, IReadOnlyCollection<VillagerData> items) : base(user, userID, items)
+        public VillagerRequest(string user, ulong UserID, IReadOnlyCollection<VillagerData> items) : base(user, UserID, items)
         {
             if (items.Count > 10)
                 throw new Exception("Too many villagers requested.");

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 
 namespace CrossBot.SysBot
 {
     public sealed class IslandState
     {
-        private readonly List<IslandVisitor> List = new();
-        private readonly object _sync = new();
+        private readonly List<IslandVisitor> List = [];
+        private readonly Lock _sync = new();
 
         public string DodoCode { get; set; } = "No code set yet.";
 

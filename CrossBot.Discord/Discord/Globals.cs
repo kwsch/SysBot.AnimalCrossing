@@ -8,9 +8,9 @@ namespace CrossBot.Discord
     public static class Globals
     {
         /// <summary> Discord Bot </summary>
-        public static SysCord Self { get; set; } = default!;
+        public static SysCord Self { get; set; } = null!;
 
         /// <summary> Hardware bot that executes the in-game commands. </summary>
-        public static Bot Bot { get; set; } = default!;
+        public static Bot Bot { get; set; } = null!;
     }
 }

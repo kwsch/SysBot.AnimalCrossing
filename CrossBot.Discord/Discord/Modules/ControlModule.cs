@@ -33,7 +33,7 @@ namespace CrossBot.Discord
         [RequireSudo]
         public async Task ToggleRequestsAsync()
         {
-            bool value = (Globals.Bot.Config.AcceptingCommands ^= true);
+            bool value = Globals.Bot.Config.AcceptingCommands ^= true;
             await ReplyAsync($"Accepting drop requests: {value}.").ConfigureAwait(false);
         }
 
@@ -42,7 +42,7 @@ namespace CrossBot.Discord
         [RequireSudo]
         public async Task ToggleSpawnsAsync()
         {
-            bool value = (Globals.Bot.FieldItemState.Config.InjectFieldItemRequest ^= true);
+            bool value = Globals.Bot.FieldItemState.Config.InjectFieldItemRequest ^= true;
             await ReplyAsync($"Accepting spawn requests: {value}.").ConfigureAwait(false);
         }
 
@@ -51,7 +51,7 @@ namespace CrossBot.Discord
         [RequireSudo]
         public async Task ToggleLayerLoadAsync()
         {
-            bool value = (Globals.Bot.FieldItemState.Config.InjectFieldItemLayer ^= true);
+            bool value = Globals.Bot.FieldItemState.Config.InjectFieldItemLayer ^= true;
             await ReplyAsync($"Refreshing field layer: {value}.").ConfigureAwait(false);
         }
 

@@ -6,14 +6,17 @@ using SysBot.Base;
 
 namespace CrossBot.SysBot
 {
-    public static class PointerUtil
+    public static partial class PointerUtil
     {
+
+        [GeneratedRegex(@"(\+|\-)([A-Fa-f0-9]+)")]
+        private static partial Regex PointerRegex();
+
         public static async Task<ulong> GetPointerAddressFromExpression(ISwitchConnectionAsync sw, string pointerExpression, CancellationToken token)
         {
             // Regex pattern to get operators and offsets from pointer expression.
-            const string pattern = @"(\+|\-)([A-Fa-f0-9]+)";
-            Regex regex = new(pattern);
-            Match match = regex.Match(pointerExpression);
+            var regex = PointerRegex();
+            var match = regex.Match(pointerExpression);
 
             // Get first offset from pointer expression and read address at that offset from main start.
             var ofs = Convert.ToUInt64(match.Groups[2].Value, 16);

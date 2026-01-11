@@ -6,12 +6,11 @@ namespace CrossBot.SysBot
     /// <summary>
     /// Tracks the state of the Drop Bot
     /// </summary>
-    public class DropBotState
+    public class DropBotState(DropBotConfig cfg)
     {
         public readonly ConcurrentQueue<DropRequest> Injections = new();
-        public DropBotState(DropBotConfig cfg) => Config = cfg;
 
-        public readonly DropBotConfig Config;
+        public readonly DropBotConfig Config = cfg;
         private int DropCount;
         private int IdleCount;
 

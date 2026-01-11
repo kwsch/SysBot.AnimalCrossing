@@ -12,7 +12,7 @@ namespace CrossBot.SysBot
         public readonly ConcurrentQueue<SpawnRequest> Injections = new();
         public readonly FieldItemConfig Config;
         private DateTime FieldItemInjectedTime = DateTime.MinValue;
-        public byte[] FieldItemLayer = Array.Empty<byte>();
+        public byte[] FieldItemLayer = [];
 
         public void ForceReload() => FieldItemInjectedTime = DateTime.MinValue;
 

@@ -1,4 +1,4 @@
-using NHSE.Core;
+﻿using NHSE.Core;
 
 namespace CrossBot.Core
 {
@@ -14,7 +14,7 @@ namespace CrossBot.Core
         public const string CoordinatePointer = "[[[[main+4627088]+18]+178]+D0]+DA";
 
         // Main player offsets functions
-        public static uint GetPlayerInventoryOffset(uint profiles) => (InventoryOffset + (PlayerSize * (profiles - 1)));
+        public static uint GetPlayerInventoryOffset(uint profiles) => InventoryOffset + (PlayerSize * (profiles - 1));
 
         // Main save offsets
         public const uint TurnipAddress = 0xAEA140F4;

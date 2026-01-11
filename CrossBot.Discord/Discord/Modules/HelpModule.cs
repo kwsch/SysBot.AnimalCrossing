@@ -7,15 +7,8 @@ using Discord.Commands;
 namespace CrossBot.Discord
 {
     // ReSharper disable once UnusedType.Global
-    public class HelpModule : ModuleBase<SocketCommandContext>
+    public class HelpModule(CommandService service) : ModuleBase<SocketCommandContext>
     {
-        private readonly CommandService _service;
-
-        public HelpModule(CommandService service)
-        {
-            _service = service;
-        }
-
         [Command("help")]
         [Summary("Lists available commands.")]
         public async Task HelpAsync()
@@ -30,10 +23,10 @@ namespace CrossBot.Discord
             var owner = app.Owner.Id;
             var uid = Context.User.Id;
 
-            foreach (var module in _service.Modules)
+            foreach (var module in service.Modules)
             {
                 string? description = null;
-                HashSet<string> mentioned = new();
+                HashSet<string> mentioned = [];
                 foreach (var cmd in module.Commands)
                 {
                     var name = cmd.Name;
@@ -67,7 +60,7 @@ namespace CrossBot.Discord
         [Summary("Lists information about a specific command.")]
         public async Task HelpAsync([Summary("The command you want help for")] string command)
         {
-            var result = _service.Search(Context, command);
+            var result = service.Search(Context, command);
 
             if (!result.IsSuccess)
             {

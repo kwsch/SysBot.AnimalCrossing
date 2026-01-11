@@ -27,7 +27,7 @@ namespace CrossBot.ConsoleApp
                 return;
             }
 
-            var json = File.ReadAllText(ConfigPath);
+            var json = await File.ReadAllTextAsync(ConfigPath);
             var cfgBot = JsonSerializer.Deserialize<BotConfig>(json);
             if (cfgBot == null)
             {
@@ -36,7 +36,7 @@ namespace CrossBot.ConsoleApp
                 return;
             }
 
-            var json_discord = File.ReadAllText(DiscordPath);
+            var json_discord = await File.ReadAllTextAsync(DiscordPath);
             var cfgDiscord = JsonSerializer.Deserialize<DiscordBotConfig>(json_discord);
             if (cfgDiscord == null)
             {
@@ -75,17 +75,19 @@ namespace CrossBot.ConsoleApp
 
             await BotRunner.RunFrom(bot, token).ConfigureAwait(false);
             WaitKeyExit();
-            cts.Cancel();
+            await cts.CancelAsync();
         }
 
         private static void SaveConfig<T>(T config, string path)
         {
+#pragma warning disable CA1869 // Cache and reuse 'JsonSerializerOptions' instances
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.Never,
                 IgnoreReadOnlyProperties = true,
             };
+#pragma warning restore CA1869 // Cache and reuse 'JsonSerializerOptions' instances
             var json = JsonSerializer.Serialize(config, options);
             File.WriteAllText(path, json);
         }

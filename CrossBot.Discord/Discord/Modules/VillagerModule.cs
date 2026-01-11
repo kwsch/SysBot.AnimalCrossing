@@ -84,7 +84,7 @@ namespace CrossBot.Discord
             var replace = VillagerSwap.GetReplacementVillager(vd, internalName, true);
             var user = Context.User;
             var mention = Context.User.Mention;
-            var request = new VillagerRequest(user.Username, user.Id, new[] {replace})
+            var request = new VillagerRequest(user.Username, user.Id, [replace])
             {
                 Index = slot,
                 OnFinish = success =>

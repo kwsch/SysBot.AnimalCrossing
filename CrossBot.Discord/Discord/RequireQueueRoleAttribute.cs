@@ -12,13 +12,11 @@ namespace CrossBot.Discord
     /// <remarks>
     /// If the user has elevated permissions (sudo) or is the owner, the command will be permitted regardless of assigned role matching.
     /// </remarks>
-    public sealed class RequireQueueRoleAttribute : PreconditionAttribute
+    public sealed class RequireQueueRoleAttribute(string name) : PreconditionAttribute
     {
         // Create a field to store the specified name
-        private readonly string _name;
 
         // Create a constructor so the name can be specified
-        public RequireQueueRoleAttribute(string name) => _name = name;
 
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
@@ -33,7 +31,7 @@ namespace CrossBot.Discord
             if (!Globals.Bot.Config.AcceptingCommands)
                 return Task.FromResult(PreconditionResult.FromError("Sorry, I am not currently accepting commands!"));
 
-            bool hasRole = mgr.GetHasRole(_name, gUser.Roles.Select(z => z.Name));
+            bool hasRole = mgr.GetHasRole(name, gUser.Roles.Select(z => z.Name));
             if (!hasRole)
                 return Task.FromResult(PreconditionResult.FromError("You do not have the required role to run this command."));
 

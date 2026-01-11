@@ -6,12 +6,11 @@ using SysBot.Base;
 
 namespace CrossBot.SysBot
 {
-    public class AdvancedViewState : PlayerViewState
+    public class AdvancedViewState(SwitchRoutineExecutor<BotConfig> con) : PlayerViewState(con)
     {
-        private byte[] InitialPlayerCoordinates = Array.Empty<byte>();
+        private byte[] InitialPlayerCoordinates = [];
 
-        public AdvancedViewState(SwitchRoutineExecutor<BotConfig> con) : base(con) => Config = con.Config.ViewConfig;
-        public readonly ViewStateConfig Config;
+        public readonly ViewStateConfig Config = con.Config.ViewConfig;
 
         public async Task Initialize(CancellationToken token)
         {
@@ -71,7 +70,7 @@ namespace CrossBot.SysBot
         /// </summary>
         public async Task WarpToIslandFromAirport(CancellationToken token)
         {
-            await Connection.WriteBytesAbsoluteAsync(new byte[] { 32, 67, 0, 0, 0, 0, 0, 0, 120, 67 }, CoordinateAddressAirport, token).ConfigureAwait(false);
+            await Connection.WriteBytesAbsoluteAsync([32, 67, 0, 0, 0, 0, 0, 0, 120, 67], CoordinateAddressAirport, token).ConfigureAwait(false);
         }
 
         public async Task WarpToDodoCounter(CancellationToken token)
@@ -80,7 +79,7 @@ namespace CrossBot.SysBot
             const string exp = Offsets.CoordinatePointer;
             CoordinateAddressAirport = await PointerUtil.GetPointerAddressFromExpression(Connection, exp, token).ConfigureAwait(false);
 
-            var coords = new byte[] {58, 67, 0, 0, 0, 0, 0, 0, 38, 67};
+            byte[] coords = [58, 67, 0, 0, 0, 0, 0, 0, 38, 67];
             await SetPosition(coords, CoordinateAddressAirport, token).ConfigureAwait(false);
         }
 

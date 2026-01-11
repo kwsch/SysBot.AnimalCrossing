@@ -26,7 +26,7 @@ namespace CrossBot.SysBot
         /// <summary> When enabled, bot picks up items when idle for <see cref="NoActivitySeconds"/> seconds. </summary>
         public bool AutoClean { get; set; }
 
-        /// <summary> When <see cref="AutoClean"/> is enabled, the bot will pick up items after the a certain amount of inactive time. </summary>
+        /// <summary> When <see cref="AutoClean"/> is enabled, the bot will pick up items after a certain amount of inactive time. </summary>
         public int NoActivitySeconds { get; set; } = 60;
 
         /// <summary> Amount of times to perform a pick-up item action. </summary>

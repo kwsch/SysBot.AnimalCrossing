@@ -36,12 +36,12 @@ namespace CrossBot.SysBot
         /// <summary> Next injection will be a minimum of Y (double-tile) item coordinates away from the previous spawn root minimum. Once a row is injected, it shifts down to the next row. </summary>
         public int SpawnSpacingY { get; set; } = 8;
 
-        /// <summary> Amount of tiles to not drop at the left side of the map.</summary>
+        /// <summary> Amount of tiles to not drop on the left side of the map.</summary>
         public int SpawnMinX { get; set; } = (int)(TilesPerAcreDim * 1.1) & ~1;
         /// <summary> Amount of tiles to not drop at the top side of the map.</summary>
         public int SpawnMinY { get; set; } = (int)(TilesPerAcreDim * 2.5) & ~1;
 
-        /// <summary> Amount of tiles to not drop at the right side of the map.</summary>
+        /// <summary> Amount of tiles to not drop on the right side of the map.</summary>
         public int SpawnMaxX { get; set; } = (int)(TilesPerAcreDim * 0.9) & ~1;
         /// <summary> Amount of tiles to not drop at the bottom side of the map.</summary>
         public int SpawnMaxY { get; set; } = (int)(TilesPerAcreDim * 1.5) & ~1;

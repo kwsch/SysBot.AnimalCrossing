@@ -76,7 +76,7 @@ namespace CrossBot.Discord
 
             const int maxLength = 500;
             if (result.Length > maxLength)
-                result = result.Substring(0, maxLength) + "...[truncated]";
+                result = result[..maxLength] + "...[truncated]";
 
             await ReplyAsync(Format.Code(result)).ConfigureAwait(false);
         }

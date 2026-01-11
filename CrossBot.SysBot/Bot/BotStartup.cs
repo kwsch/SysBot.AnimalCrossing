@@ -27,7 +27,7 @@ namespace CrossBot.SysBot
                 await b.VillagerState.InitializeVillagers(token).ConfigureAwait(false);
 
             if (b.Config.ViewConfig.SkipSessionCheck)
-                return await StartupGetDodoCode(b.ViewState, b, token, true).ConfigureAwait(false);
+                return await b.ViewState.StartupGetDodoCode(b, token, true).ConfigureAwait(false);
 
             var sessionActive = await b.ViewState.IsLinkSessionActive(token).ConfigureAwait(false);
             if (sessionActive)
@@ -100,7 +100,7 @@ namespace CrossBot.SysBot
             }
 
             b.Island.DodoCode = code;
-            File.WriteAllText(dodoFile, code);
+            await File.WriteAllTextAsync(dodoFile, code, token).ConfigureAwait(false);
             return true;
         }
     }

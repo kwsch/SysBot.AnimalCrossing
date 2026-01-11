@@ -39,7 +39,7 @@ namespace CrossBot.Discord
                 LogLevel = LogSeverity.Info,
 
                 // If you or another service needs to do anything with messages
-                // (eg. checking Reactions, checking the content of edited/deleted messages),
+                // (e.g. checking Reactions, checking the content of edited/deleted messages),
                 // you must set the MessageCacheSize. You may adjust the number as needed.
                 //MessageCacheSize = 50,
             });
@@ -50,7 +50,7 @@ namespace CrossBot.Discord
                 LogLevel = LogSeverity.Info,
 
                 // This makes commands get run on the task thread pool instead on the websocket read thread.
-                // This ensures long running logic can't block the websocket connection.
+                // This ensures long-running logic can't block the websocket connection.
                 DefaultRunMode = RunMode.Sync,
 
                 // There's a few more properties you can set,
@@ -69,7 +69,7 @@ namespace CrossBot.Discord
         // If any services require the client, or the CommandService, or something else you keep on hand,
         // pass them as parameters into this method as needed.
         // If this method is getting pretty long, you can separate it out into another file using partials.
-        private static IServiceProvider ConfigureServices()
+        private static ServiceProvider ConfigureServices()
         {
             var map = new ServiceCollection();//.AddSingleton(new SomeServiceClass());
 
@@ -136,7 +136,7 @@ namespace CrossBot.Discord
             var modules = _commands.Modules.ToList();
 
             var blacklist = cfg.ModuleBlacklist
-                .Replace("Module", "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Replace("Module", "").Split([','], StringSplitOptions.RemoveEmptyEntries)
                 .Select(z => z.Trim()).ToList();
 
             foreach (var module in modules)

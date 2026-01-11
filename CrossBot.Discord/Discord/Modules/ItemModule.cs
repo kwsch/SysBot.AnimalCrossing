@@ -62,7 +62,7 @@ namespace CrossBot.Discord
             {
                 var ordered = matches.OrderBy(z => LevenshteinDistance.Compute(z.Text, itemName));
                 result = string.Join(Environment.NewLine, ordered.Select(z => $"{z.Value:X4} {z.Text}"));
-                result = result.Substring(0, maxLength) + "...[truncated]";
+                result = result[..maxLength] + "...[truncated]";
             }
 
             await ReplyAsync(Format.Code(result)).ConfigureAwait(false);

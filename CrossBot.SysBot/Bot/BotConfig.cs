@@ -20,7 +20,7 @@ namespace CrossBot.SysBot
         /// Offset the items are injected at. This should be the player inventory slot you have currently selected in-game.
         /// <remarks>If left at 0, will try to autodetect based on profile counts per the latest patch offsets.</remarks>
         /// </summary>
-        public uint Offset { get; set; } = 0;
+        public uint Offset { get; set; }
 
         /// <summary> Amount of player profiles on the console. </summary>
         public uint ProfileCount { get; set; } = 1;

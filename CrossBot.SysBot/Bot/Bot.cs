@@ -96,7 +96,7 @@ namespace CrossBot.SysBot
                 Log($"Dropped {count}/{item.Items.Count} items for {item.User} ({item.UserID}).");
                 DropState.AfterDrop(item, count);
             }
-            else if ((DropState.CleanRequired && DropState.Config.AutoClean) || DropState.CleanRequested)
+            else if (DropState is { CleanRequired: true, Config.AutoClean: true } || DropState.CleanRequested)
             {
                 await CleanUp(DropState.Config.PickupCount, token).ConfigureAwait(false);
                 DropState.AfterClean();

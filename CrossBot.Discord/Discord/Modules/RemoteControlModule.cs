@@ -62,7 +62,7 @@ namespace SysBot.Pokemon.Discord
         {
             var b = Bot;
             var result = await b.Connection.ReadBytesAsync(offset, length, CancellationToken.None).ConfigureAwait(false);
-            File.WriteAllBytes("dump.bin", result);
+            await File.WriteAllBytesAsync("dump.bin", result);
             await ReplyAsync("Done.").ConfigureAwait(false);
         }
 

@@ -7,22 +7,16 @@ using SysBot.Base;
 
 namespace CrossBot.SysBot
 {
-    public abstract class PlayerViewState
+    public abstract class PlayerViewState(SwitchRoutineExecutor<BotConfig> con)
     {
-        protected readonly ISwitchConnectionAsync Connection;
-        protected readonly SwitchRoutineExecutor<BotConfig> Executor;
+        protected readonly ISwitchConnectionAsync Connection = (ISwitchConnectionAsync)con.Connection;
+        protected readonly SwitchRoutineExecutor<BotConfig> Executor = con;
 
         protected const uint LinkSessionActiveOffset = Offsets.OnlineSessionAddress;
         protected const uint DodoCodeOffset = Offsets.DodoAddress;
         protected ulong CoordinateAddressIsland;
         protected ulong CoordinateAddressAirport;
         protected const int PlayerCoordinateSize = 10;
-
-        protected PlayerViewState(SwitchRoutineExecutor<BotConfig> con)
-        {
-            Executor = con;
-            Connection = (ISwitchConnectionAsync)con.Connection;
-        }
 
         protected async Task SetPosition(ushort x, ushort y, ulong address, CancellationToken token)
         {
@@ -44,7 +38,7 @@ namespace CrossBot.SysBot
             await Connection.WriteBytesAbsoluteAsync(r, address, token).ConfigureAwait(false);
         }
 
-        // Checks if player is in overworld (outside of a building).
+        // Checks if player is in overworld (outside a building).
         protected async Task<bool> IsOverworld(CancellationToken token)
         {
             var state = await Connection.ReadBytesAbsoluteAsync(CoordinateAddressIsland + 0x1E, 0x4, token).ConfigureAwait(false);

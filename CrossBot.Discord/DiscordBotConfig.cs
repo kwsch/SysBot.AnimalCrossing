@@ -26,9 +26,9 @@ namespace CrossBot.Discord
         public bool SetStatusAsDodoCode { get; set; } = true;
 
         // 64bit numbers white-listing certain channels/users for permission
-        public List<ulong> Channels { get; set; } = new();
-        public List<ulong> Users { get; set; } = new();
-        public List<ulong> Sudo { get; set; } = new();
+        public List<ulong> Channels { get; set; } = [];
+        public List<ulong> Users { get; set; } = [];
+        public List<ulong> Sudo { get; set; } = [];
 
         /// <summary>
         /// Modules that are blacklisted. Comma separated, by class name.
