@@ -7,38 +7,56 @@ trigger:
 - master
 
 pool:
-  name: Azure Pipelines
   vmImage: 'windows-latest'
-  demands:
-  - msbuild
-  - visualstudio
+
+# Build number format: YYYYMMDD.<run>
+# Example: 20260110.3
+name: $(Date:yyyyMMdd).$(Rev:r)
 
 variables:
-  Solution: '**/*.sln'
-  Platform: 'Any CPU'
-  Configuration: 'Release'
+  solution: '**/*.slnx'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
 
 steps:
+# Restore
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
   inputs:
-    command: 'restore'
-    restoreSolution: '**/*.sln'
-    
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
+    restoreSolution: '$(solution)'
 
+# Build with version stamping
 - task: VSBuild@1
   inputs:
-    solution: '$(Solution)'
-    platform: '$(Platform)'
-    configuration: '$(Configuration)'
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArgs: >
+      /p:AssemblyVersion=$(Build.BuildId)
+      /p:Version=$(Build.BuildNumber)
+      /p:FileVersion=$(Build.BuildId)
+      /p:InformationalVersion=$(Build.SourceVersion)
 
+# Dynamically detect the TFM folder (net9.0-windows, net10.0-windows, etc.)
+- powershell: |
+    $root = "$(Build.SourcesDirectory)\CrossBot.ConsoleApp\bin\Release"
+    $path = Get-ChildItem -Directory -Path $root |
+            Where-Object { $_.Name -match '^net' } |
+            Select-Object -First 1 -ExpandProperty FullName
+
+    if (-not $path) {
+        Write-Error "Could not find TFM output folder"
+        exit 1
+    }
+
+    Write-Host "##vso[task.setvariable variable=PublishPath]$path"
+  displayName: "Detect TFM output folder"
+
+# Publish
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: SysBot-ACNH'
   inputs:
-    PathtoPublish: 'CrossBot.ConsoleApp\bin\Release\net47'
+    PathtoPublish: '$(PublishPath)'
     ArtifactName: SysBot-ACNH
   condition: succeededOrFailed()
