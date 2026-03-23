@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibUsbDotNet" Version="2.2.75" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CrossBot.Core\CrossBot.Core.csproj" />
     <ProjectReference Include="..\CrossBot.Discord\CrossBot.Discord.csproj" />
     <ProjectReference Include="..\CrossBot.SysBot\CrossBot.SysBot.csproj" />
