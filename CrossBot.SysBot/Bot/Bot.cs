@@ -28,6 +28,13 @@ public sealed class Bot : SwitchRoutineExecutor<BotConfig>
     public readonly VillagerState VillagerState;
 
     public override void SoftStop() => Config.AcceptingCommands = false;
+    public override Task HardStop()
+    {
+        SoftStop();
+        return Task.CompletedTask;
+    }
+
+    public override string GetSummary() => $"Island: {Island.DodoCode}, Drop Requests: {DropState.Injections.Count}, Field Spawns: {FieldItemState.Injections.Count}, Villager Injections: {VillagerState.Injections.Count}";
 
     public override async Task MainLoop(CancellationToken token)
     {
